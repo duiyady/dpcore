@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.duiya.dao.FileDao">
+    <insert id="save" parameterType="java.util.List">
+        insert into t_file(file_name,file_time,file_owner,file_state,file_fserver) values
+        <foreach collection="list" item="item" index= "index" separator =",">
+            (#{item.fileName},#{item.fileTime},#{item.fileOwner},#{item.fileState},#{item.fileFserver})
+        </foreach>
+    </insert>
+</mapper>
