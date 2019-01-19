@@ -6,7 +6,7 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
-import com.duiya.init.DPCoreInit;
+import com.duiya.init.BaseConfig;
 import com.duiya.interceptor.MonitorInterceptor;
 import com.duiya.interceptor.SlaveInterceptor;
 import org.springframework.context.annotation.Bean;
@@ -81,7 +81,7 @@ public class SpringMvcConfig implements WebMvcConfigurer {
      * 添加拦截器
      */
     public void addInterceptors(InterceptorRegistry registry) {
-        if(DPCoreInit.MONITOR){
+        if(BaseConfig.MONITOR){
             registry.addInterceptor(getMonitorInterceptor());
         }
         registry.addInterceptor(getSlaveInterceptor());

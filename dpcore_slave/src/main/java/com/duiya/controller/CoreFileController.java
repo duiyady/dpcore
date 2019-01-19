@@ -1,11 +1,11 @@
 package com.duiya.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.duiya.init.DPCoreInit;
+import com.duiya.init.BaseConfig;
 import com.duiya.model.Location;
 import com.duiya.service.FileManageService;
 import com.duiya.utils.ResponseEnum;
-import com.duiya.utils.ResponseUtils;
+import com.duiya.utils.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,19 +46,19 @@ public class CoreFileController {
         Location location1 = Location.getLocation(location);
         //图片地址不符合规范
         if (location1 == null) {
-            return ResponseUtils.constructArgErrorResponse("the location is error");
+            return ResponseUtil.constructArgErrorResponse("the location is error");
         }
 
-        File file = new File(location1.getPath(DPCoreInit.ROOT_LOCATION));
+        File file = new File(location1.getPath(BaseConfig.ROOT_LOCATION));
         byte[] img = null;
         if (!file.exists()) {
-            return ResponseUtils.constructResponse(ResponseEnum.NULL_PIC, "can not find ther pic", null);
+            return ResponseUtil.constructResponse(ResponseEnum.NULL_PIC, "can not find ther pic", null);
         }
-        img = fileManageService.getFile(location1.getPath(DPCoreInit.ROOT_LOCATION));
+        img = fileManageService.getFile(location1.getPath(BaseConfig.ROOT_LOCATION));
         if (img == null) {
-            return ResponseUtils.constructUnknownErrorResponse("unknown error");
+            return ResponseUtil.constructUnknownErrorResponse("unknown error");
         }
-        return ResponseUtils.constructOKResponse("success", img);
+        return ResponseUtil.constructOKResponse("success", img);
     }
 
     @RequestMapping(value = "put", method = RequestMethod.POST)
@@ -78,13 +78,13 @@ public class CoreFileController {
                     fileManageService.saveFile(multipartFiles);
                 } catch (Exception e) {
                     logger.error("failed to upload file", e);
-                    return ResponseUtils.constructUnknownErrorResponse("unknown error, please try again later");
+                    return ResponseUtil.constructUnknownErrorResponse("unknown error, please try again later");
                 }
             } else {
-                return ResponseUtils.constructArgErrorResponse("the file is empty");
+                return ResponseUtil.constructArgErrorResponse("the file is empty");
             }
         }
-        return ResponseUtils.constructArgErrorResponse("unknown hosts");
+        return ResponseUtil.constructArgErrorResponse("unknown hosts");
     }
 
 

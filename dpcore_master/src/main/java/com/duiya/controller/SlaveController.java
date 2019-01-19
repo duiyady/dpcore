@@ -2,16 +2,17 @@ package com.duiya.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.duiya.cache.RedisCache;
-import com.duiya.init.DPCoreInit;
+import com.duiya.init.BaseConfig;
 import com.duiya.init.SlaveMess;
 import com.duiya.model.Slave;
 import com.duiya.utils.RSAUtil;
-import com.duiya.utils.ResponseUtils;
+import com.duiya.utils.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -28,19 +29,25 @@ public class SlaveController {
     private RedisCache redisCache;
 
     /**
-     * 注册slave pubkeystr是slave用自己的私钥加密IPHASH6,再用master的公钥加密那个
-     * @param pubKeyStr
+     * 注册slave
+     * @param flag slave用自己的私钥再用master的公钥加密的IPHASH6
+     * @param pubKeyStr slave的公钥
+     * @param baseUrl slave的url的默认部分
+     * @param request
      * @return
      */
-    @RequestMapping("regist")
+    @RequestMapping(value = "regist", method = RequestMethod.POST)
     @ResponseBody
     public JSONObject regist(@RequestParam(value = "flag")String flag,
                              @RequestParam(value = "pubKeyStr")String pubKeyStr,
+                             @RequestParam(value = "baseUrl")String baseUrl,
                              HttpServletRequest request){
         String ip = request.getHeader("x-forwarded-for");
         if(ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) ip = request.getHeader("Proxy-Client-IP");
         if(ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) ip = request.getHeader("WL-Proxy-Client-IP");
         if(ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) ip = request.getRemoteAddr();
+
+        System.out.println("进来啦");
 
         logger.info("invoke--------------------slave/regist?ip:" + ip);
         String ipHash6  = String.valueOf(ip.hashCode()).substring(0, 6);
@@ -48,7 +55,7 @@ public class SlaveController {
         String s2 = null;
         try {
             pubKey = RSAUtil.getKey(pubKeyStr);
-            String s1 = RSAUtil.decrypt(flag, DPCoreInit.privateKey);
+            String s1 = RSAUtil.decrypt(flag, BaseConfig.PRIVATE_KEY);
             s2 = RSAUtil.decrypt(s1, pubKey);
         } catch (Exception e) {
             logger.error("添加slave失败", e);
@@ -62,9 +69,9 @@ public class SlaveController {
             SlaveMess.addSlave(slave);
             redisCache.putPerpetualListCache("slaves", SlaveMess.slaves);
             logger.info("invoke--------------------slave/regist?ip:" + ip +  "success");
-            return ResponseUtils.constructOKResponse("success", null);
+            return ResponseUtil.constructOKResponse("success", null);
         }else{
-            return ResponseUtils.constructUnknownErrorResponse("添加失败");
+            return ResponseUtil.constructUnknownErrorResponse("添加失败");
         }
     }
 
@@ -81,6 +88,6 @@ public class SlaveController {
         if(ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) ip = request.getRemoteAddr();
 
         System.out.println(ip);
-        return ResponseUtils.constructOKResponse("success", ip);
+        return ResponseUtil.constructOKResponse("success", ip);
     }
 }

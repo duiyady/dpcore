@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class Escala implements Serializable {
 
 
+    private static final long serialVersionUID = -1927326120578298760L;
     private int flag;
 
     private String IP;

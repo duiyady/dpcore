@@ -90,6 +90,11 @@ public class Location {
         Sec = sec;
     }
 
+    /**
+     * 传入一串图片地址，获取一个Location对象
+     * @param string
+     * @return
+     */
     public static Location getLocation(String string){
         if(string.length() != 28){
             return null;
@@ -106,18 +111,18 @@ public class Location {
     }
 
     /**
-     * 获取location对象的屋里地址
+     * 获取location对象在服务器的地址
      * @return
      */
     public String getPath(String ROOT){
         StringBuilder sb = new StringBuilder();
-        sb.append(ROOT).append(IPHash6).append("/")
-                .append(YMR).append("/").append(Min).append("/").append(Hour).append(Sec).append(UUid8);
+        sb.append(ROOT).append(this.IPHash6).append("/")
+                .append(this.YMR).append("/").append(this.Min).append("/").append(this.Hour).append(this.Sec).append(this.UUid8);
         return sb.toString();
     }
 
     /**
-     * 根据location获取path
+     * 根据图片的名字获取在物理机的地址
      * @param string
      * @return
      */

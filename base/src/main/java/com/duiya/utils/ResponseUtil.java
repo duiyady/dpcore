@@ -2,7 +2,7 @@ package com.duiya.utils;
 
 import com.alibaba.fastjson.JSONObject;
 
-public class ResponseUtils {
+public class ResponseUtil {
     /**
      * @author jipeng
      * @return
@@ -62,7 +62,6 @@ public class ResponseUtils {
 
     /**
      * ok 返回
-     *
      * @param msg
      * @param data
      * @return

@@ -2,7 +2,7 @@ package com.duiya.service.impl;
 
 import com.duiya.cache.RedisCache;
 import com.duiya.dao.FileDao;
-import com.duiya.init.DPCoreInit;
+import com.duiya.init.BaseConfig;
 import com.duiya.model.Location;
 import com.duiya.model.Picture;
 import com.duiya.model.Slave;
@@ -45,12 +45,12 @@ public class FileManageServiceImpl implements FileManageService {
             MultipartFile mf = multipartFiles[i];
             if(!mf.isEmpty()){
                 Picture picture = new Picture();
-                List<Object> list = Location.getFileName(DPCoreInit.IPHASH6, DPCoreInit.ROOT_LOCATION);
+                List<Object> list = Location.getFileName(BaseConfig.IPHASH6, BaseConfig.ROOT_LOCATION);
                 picture.setFileName(String.valueOf(list.get(0)));
                 picture.setFileTime(Long.valueOf(String.valueOf(list.get(2))));
-                picture.setFileFserver(DPCoreInit.IPHASH6);
+                picture.setFileFserver(BaseConfig.IPHASH6);
                 picture.setFileOwner(account);
-                picture.setFileState(DPCoreInit.IPHASH6 );
+                picture.setFileState(BaseConfig.IPHASH6 );
                 try {
                     File ft = new File(String.valueOf(list.get(1)));
                     if(!ft.exists()){
@@ -97,7 +97,7 @@ public class FileManageServiceImpl implements FileManageService {
             if(!mf.isEmpty()){
                 String contentType=mf.getContentType();
                 String imageName = contentType.substring(contentType.indexOf("/")+1);
-                String filePath = Location.getPath(imageName, DPCoreInit.ROOT_LOCATION);
+                String filePath = Location.getPath(imageName, BaseConfig.ROOT_LOCATION);
                 try {
                     File ft = new File(filePath);
                     if(!ft.exists()){

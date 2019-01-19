@@ -1,7 +1,7 @@
 package com.duiya.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.duiya.utils.ResponseUtils;
+import com.duiya.utils.ResponseUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,9 +31,9 @@ public class TestController {
         // 判断文件是否为空
         if (multipartFiles != null && multipartFiles.length >= 1) {
             System.out.println(name);
-            return ResponseUtils.constructOKResponse("", "");
+            return ResponseUtil.constructOKResponse("", "");
         } else {
-            return ResponseUtils.constructArgErrorResponse("the file is empty");
+            return ResponseUtil.constructArgErrorResponse("the file is empty");
         }
     }
 }

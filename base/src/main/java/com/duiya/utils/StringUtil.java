@@ -1,6 +1,6 @@
 package com.duiya.utils;
 
-public class StringUtils {
+public class StringUtil {
     /**
      * 判断String是否为空
      * @param string

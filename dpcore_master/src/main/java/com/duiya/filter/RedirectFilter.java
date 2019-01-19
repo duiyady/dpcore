@@ -2,7 +2,10 @@ package com.duiya.filter;
 
 
 import com.duiya.model.ResponseModel;
+import com.duiya.utils.HttpUtil;
 import com.duiya.utils.ResponseEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -12,6 +15,8 @@ import java.io.IOException;
 
 @WebFilter(filterName = "redirectFilter", urlPatterns = "/*")
 public class RedirectFilter implements Filter {
+    private Logger logger = LoggerFactory.getLogger(RedirectFilter.class);
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         return;
@@ -22,41 +27,41 @@ public class RedirectFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         String uri = request.getRequestURI();
-        String op = request.getQueryString();
-        if (uri.contains("/fileop/get")) {
-            String u = "http://www.duiyy.cn/dpcore-slave" + uri + "?" + op;
-            System.out.println(u);
-            response.sendRedirect(u);
-            return;
-        } else if (uri.contains("/fileop/testGet")) {
-            String u = "http://www.duiyy.cn/dpcore-slave" + uri;
-            System.out.println(u);
-            response.sendRedirect(u);
-            return;
-        } else if (uri.contains("/fileop/testPost")) {
-            String u = "http://www.duiyy.cn/dpcore-slave" + uri;
-            System.out.println(u);
-            request.getRequestDispatcher(u).forward(servletRequest, servletResponse);
-        } else if (uri.contains("/test")) {
-            System.out.println(request.getRequestURI() + "==================" + Thread.currentThread().getName());
-            if (request.getMethod().equalsIgnoreCase("post")) {
-
-            } else {
-
-                filterChain.doFilter(servletRequest, servletResponse);
+        String method = request.getMethod();
+        System.out.println("收到请求：" + request.getRequestURL());
+        if (method.equalsIgnoreCase("get")) {
+            if (uri.contains("/fileop/*") || uri.contains("/user/*")) {
+                System.out.println("拦截到get请求重定向：" + request.getRequestURL());
+                String op = request.getQueryString();
+                String u = "http://localhost:10086/dpcore-slave" + uri + "?" + op;
+                try {
+                    response.sendRedirect(u);
+                } catch (IOException e) {
+                    logger.error("转发失败", e);
+                }
+                return;
             }
-        }else if(uri.contains("/fileop/upload")){
-            String url = "http://www.duiyy.cn/dpcore-slave" + uri;
-            ResponseModel responseModel = MyHttpUtils.transmitPost(url, request);
-            if(responseModel.getCode() != ResponseEnum.UNKNOEN_ERROR){
-                response.getOutputStream().print(responseModel.toString());
-                response.getOutputStream().flush();
-                response.getOutputStream().close();
+        } else if (method.equalsIgnoreCase("post")) {
+            if (uri.contains("/fileop/*") || uri.contains("/user/*")) {
+                String url = "http://localhost:10086/dpcore-slave" + uri;
+                ResponseModel responseModel = null;
+                try {
+                    responseModel = HttpUtil.transmitPost(url, request);
+                } catch (IOException e) {
+                    System.out.println("那个服务器不可用");
+                }
+                if (responseModel.getCode() != ResponseEnum.UNKNOEN_ERROR) {
+                    try {
+                        response.getOutputStream().print(responseModel.toString());
+                        response.getOutputStream().flush();
+                        response.getOutputStream().close();
+                    } catch (IOException e) {
+                        logger.error("转发失败");
+                    }
+                }
             }
-
-        }else{
-            filterChain.doFilter(servletRequest, servletResponse);
         }
+        filterChain.doFilter(servletRequest, servletResponse);
     }
 
     @Override

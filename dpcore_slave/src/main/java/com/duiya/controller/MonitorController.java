@@ -2,10 +2,10 @@ package com.duiya.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.duiya.cache.RedisCache;
-import com.duiya.init.DPCoreInit;
+import com.duiya.init.BaseConfig;
 import com.duiya.service.FileBackupService;
 import com.duiya.utils.RSAUtil;
-import com.duiya.utils.ResponseUtils;
+import com.duiya.utils.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class MonitorController {
     @CrossOrigin//跨域
     public JSONObject keepAlive(){
         logger.info("invoke--------------------monitor/isalive");
-        return ResponseUtils.constructOKResponse("success", null);
+        return ResponseUtil.constructOKResponse("success", null);
     }
 
     /**
@@ -46,19 +46,19 @@ public class MonitorController {
     public JSONObject sync(@RequestParam(value = "last") Long last,
                            @RequestParam(value = "now") Long now,
                            @RequestParam(value = "flag") String flag){
-        String ipHash6  = String.valueOf(DPCoreInit.MASTER_IP.hashCode()).substring(0, 6);
+        String ipHash6  = String.valueOf(BaseConfig.MASTER_IP.hashCode()).substring(0, 6);
         String s2 = null;
         try {
-            String s1 = RSAUtil.decrypt(flag, DPCoreInit.privateKey);
-            s2 = RSAUtil.decrypt(s1, DPCoreInit.masterPublicKey);
+            String s1 = RSAUtil.decrypt(flag, BaseConfig.PRIVATE_KEY);
+            s2 = RSAUtil.decrypt(s1, BaseConfig.MASTER_PUBLICKEY);
         } catch (Exception e) {
             logger.error("未知错误");
-            return ResponseUtils.constructUnknownErrorResponse("failed");
+            return ResponseUtil.constructUnknownErrorResponse("failed");
         }
         if(s2.equals(ipHash6)){
             fileBackupService.aync(last, now);
         }
-        return ResponseUtils.constructOKResponse("success", null);
+        return ResponseUtil.constructOKResponse("success", null);
     }
 
 

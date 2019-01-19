@@ -1,13 +1,13 @@
 package com.duiya.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.duiya.init.DPCoreInit;
+import com.duiya.init.BaseConfig;
 import com.duiya.model.Location;
 import com.duiya.service.FileBackupService;
 import com.duiya.service.FileManageService;
 import com.duiya.service.KeyService;
-import com.duiya.utils.ResponseUtils;
-import com.duiya.utils.StringUtils;
+import com.duiya.utils.ResponseUtil;
+import com.duiya.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,9 +52,9 @@ public class FileManageController {
                                  @RequestParam(value = "key", required = false) String key){
 
 
-        if(DPCoreInit.VERIFIED){
-            if(StringUtils.isBlank(account, key)){
-                return ResponseUtils.constructArgErrorResponse("you should get a key");
+        if(BaseConfig.VERIFIED){
+            if(StringUtil.isBlank(account, key)){
+                return ResponseUtil.constructArgErrorResponse("you should get a key");
             }
         }
 
@@ -63,26 +63,26 @@ public class FileManageController {
             try {
                 //文件数量过多
                 if(multipartFiles.length > 9){
-                    return ResponseUtils.constructOversizeResponse("please upload less than 9 files");
+                    return ResponseUtil.constructOversizeResponse("please upload less than 9 files");
                 }
                 //如果需要判断密钥是否正确
                 if(keyService.verify(account, key)) {
                     //进行文件保存
                     List<String> result = fileManageService.saveFile(account, multipartFiles);
                     if (result != null) {
-                        return ResponseUtils.constructOKResponse("requst succeed", result);
+                        return ResponseUtil.constructOKResponse("requst succeed", result);
                     } else {
-                        return ResponseUtils.constructUnknownErrorResponse("unknow error, please try again later");
+                        return ResponseUtil.constructUnknownErrorResponse("unknow error, please try again later");
                     }
                 }else{
-                    return ResponseUtils.constructArgErrorResponse("key error");
+                    return ResponseUtil.constructArgErrorResponse("key error");
                 }
             } catch (Exception e) {
                 logger.error("failed to upload file", e);
-                return ResponseUtils.constructUnknownErrorResponse("unknown error, please try again later");
+                return ResponseUtil.constructUnknownErrorResponse("unknown error, please try again later");
             }
         }else{
-            return ResponseUtils.constructArgErrorResponse("the file is empty");
+            return ResponseUtil.constructArgErrorResponse("the file is empty");
         }
     }
 
@@ -95,12 +95,12 @@ public class FileManageController {
         if(location1 == null){
             return "the location is error";
         }
-        String path = location1.getPath(DPCoreInit.ROOT_LOCATION);
+        String path = location1.getPath(BaseConfig.ROOT_LOCATION);
         File file = new File(path);
         byte[] img = null;
         if(!file.exists()){
             //文件不存在而且第一次保存主机是本机，则文件肯定不对
-            if(location1.getIPHash6().equals(DPCoreInit.IPHASH6)){
+            if(location1.getIPHash6().equals(BaseConfig.IPHASH6)){
                 return "can not find ther pic";
             }else{
                 //向文件第一个主机请求同步
@@ -133,11 +133,11 @@ public class FileManageController {
     public JSONObject fileDelete(@RequestParam(name = "account")String account,
                                  @RequestParam(name = "key") String key,
                                  @RequestParam(name = "location")String location){
-        if(!StringUtils.isBlank(account, key, location)){
+        if(!StringUtil.isBlank(account, key, location)){
             //进行删除，要检验那个图片是否是那个用户的
 
         }else{
-            return ResponseUtils.constructArgErrorResponse("the account, key and location cannot be empty");
+            return ResponseUtil.constructArgErrorResponse("the account, key and location cannot be empty");
         }
         return null;
     }
@@ -145,13 +145,13 @@ public class FileManageController {
     @RequestMapping(value = "testGet", method = RequestMethod.GET)
     @ResponseBody
     public JSONObject testGet(){
-        return ResponseUtils.constructOKResponse("successget", "duiya");
+        return ResponseUtil.constructOKResponse("successget", "duiya");
     }
 
     @RequestMapping(value = "testPost", method = RequestMethod.POST)
     @ResponseBody
     public JSONObject testPost(){
-        return ResponseUtils.constructOKResponse("successpost", "duiya");
+        return ResponseUtil.constructOKResponse("successpost", "duiya");
     }
 
 

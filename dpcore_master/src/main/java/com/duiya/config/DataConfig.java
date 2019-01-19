@@ -17,18 +17,19 @@ import java.io.IOException;
 
 @Configuration
 public class DataConfig {
+    private PropertiesUtil propertiesUtil = new PropertiesUtil("dpcore-master.properties");
     @Bean
     public BasicDataSource getBasicDataSource(){
         BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setDriverClassName(PropertiesUtil.getStringValue("driverClassName"));
-        dataSource.setUrl(PropertiesUtil.getStringValue("url"));
-        dataSource.setUsername(PropertiesUtil.getStringValue("username"));
-        dataSource.setPassword(PropertiesUtil.getStringValue("password"));
-        dataSource.setInitialSize(PropertiesUtil.getIntValue("initialSize"));
-        dataSource.setMaxTotal(PropertiesUtil.getIntValue("maxTotal"));
-        dataSource.setMaxIdle(PropertiesUtil.getIntValue("maxIdle"));
-        dataSource.setMinIdle(PropertiesUtil.getIntValue("minIdle"));
-        dataSource.setMaxWaitMillis(PropertiesUtil.getLongValue("maxWait"));
+        dataSource.setDriverClassName(propertiesUtil.getStringValue("driverClassName"));
+        dataSource.setUrl(propertiesUtil.getStringValue("url"));
+        dataSource.setUsername(propertiesUtil.getStringValue("username"));
+        dataSource.setPassword(propertiesUtil.getStringValue("password"));
+        dataSource.setInitialSize(propertiesUtil.getIntValue("initialSize"));
+        dataSource.setMaxTotal(propertiesUtil.getIntValue("maxTotal"));
+        dataSource.setMaxIdle(propertiesUtil.getIntValue("maxIdle"));
+        dataSource.setMinIdle(propertiesUtil.getIntValue("minIdle"));
+        dataSource.setMaxWaitMillis(propertiesUtil.getLongValue("maxWait"));
         return dataSource;
     }
 
@@ -52,20 +53,20 @@ public class DataConfig {
     @Bean
     public JedisPoolConfig getJedisPoolConfig(){
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-        jedisPoolConfig.setMaxTotal(PropertiesUtil.getIntValue("redis.maxTotal"));
-        jedisPoolConfig.setMaxIdle(PropertiesUtil.getIntValue("redis.maxIdle"));
-        jedisPoolConfig.setMinIdle(PropertiesUtil.getIntValue("redis.minIdle"));
-        jedisPoolConfig.setMaxWaitMillis(PropertiesUtil.getLongValue("redis.maxWaitMillis"));
-        jedisPoolConfig.setTestOnBorrow(PropertiesUtil.getBooleanValue("redis.testOnBorrow"));
+        jedisPoolConfig.setMaxTotal(propertiesUtil.getIntValue("redis.maxTotal"));
+        jedisPoolConfig.setMaxIdle(propertiesUtil.getIntValue("redis.maxIdle"));
+        jedisPoolConfig.setMinIdle(propertiesUtil.getIntValue("redis.minIdle"));
+        jedisPoolConfig.setMaxWaitMillis(propertiesUtil.getLongValue("redis.maxWaitMillis"));
+        jedisPoolConfig.setTestOnBorrow(propertiesUtil.getBooleanValue("redis.testOnBorrow"));
         return jedisPoolConfig;
     }
 
     @Bean
     public JedisConnectionFactory getJedisConnectionFactory(){
         JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
-        connectionFactory.setHostName(PropertiesUtil.getStringValue("redis.ip"));
-        connectionFactory.setPort(PropertiesUtil.getIntValue("redis.port"));
-        connectionFactory.setPassword(PropertiesUtil.getStringValue("redis.password"));
+        connectionFactory.setHostName(propertiesUtil.getStringValue("redis.ip"));
+        connectionFactory.setPort(propertiesUtil.getIntValue("redis.port"));
+        connectionFactory.setPassword(propertiesUtil.getStringValue("redis.password"));
         connectionFactory.setPoolConfig(getJedisPoolConfig());
         return connectionFactory;
     }

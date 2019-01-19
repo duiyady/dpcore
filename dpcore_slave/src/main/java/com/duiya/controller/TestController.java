@@ -1,7 +1,7 @@
 package com.duiya.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.duiya.utils.ResponseUtils;
+import com.duiya.utils.ResponseUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,7 +40,7 @@ public class TestController {
             System.out.println(name + ":" + request.getHeader(name));
         }
         System.out.println("===================================================================");
-        return ResponseUtils.constructOKResponse("","");
+        return ResponseUtil.constructOKResponse("","");
 
     }
 
@@ -70,7 +70,7 @@ public class TestController {
 
 
 
-        return ResponseUtils.constructOKResponse("","");
+        return ResponseUtil.constructOKResponse("","");
     }
 
     @RequestMapping(value = "upload", method = RequestMethod.POST)
@@ -97,7 +97,7 @@ public class TestController {
         }
         System.out.println(wholeStr);
 
-        return ResponseUtils.constructOKResponse("","");
+        return ResponseUtil.constructOKResponse("","");
     }
 
 

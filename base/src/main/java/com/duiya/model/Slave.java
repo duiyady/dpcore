@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.security.Key;
 
 public class Slave implements Serializable {
+    private static final long serialVersionUID = -5533065529826005736L;
     private String IPHash6;
 
     private String IP;

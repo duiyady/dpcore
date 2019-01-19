@@ -2,12 +2,13 @@ package com.duiya.init;
 
 import com.duiya.model.ResponseModel;
 import com.duiya.model.Slave;
-import com.duiya.utils.HttpUtils;
+import com.duiya.utils.HttpUtil;
 import com.duiya.utils.RSAUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,20 +26,20 @@ public class TimeFunction {
     @Scheduled(fixedRate = 1000 * 60 * 30) //通过@Scheduled声明该方法是计划任务，使用fixedRate属性每隔固定时间执行。
     public void requestASYN() {
         Long now = new Date().getTime();
-        DPCoreInit.ASYNtime1 = DPCoreInit.ASYNtime2;
-        DPCoreInit.ASYNtime2 = now;
+        BaseConfig.ASYNtime1 = BaseConfig.ASYNtime2;
+        BaseConfig.ASYNtime2 = now;
 
         logger.info("-----------------开始同步----------------");
         String preUrl = "http://";
-        String lastUrl = ":8080/dpcore-slave/monitor/sync";
+        String lastUrl = ":10086/dpcore-slave/monitor/sync";
         StringBuilder sb = new StringBuilder();
         //http://ip:8080/dpcore-slave/monitor/alive
         try {
-            String s1 = RSAUtil.decrypt(DPCoreInit.IPHASH6, DPCoreInit.privateKey);
+            String s1 = RSAUtil.decrypt(BaseConfig.IPHASH6, BaseConfig.PRIVATE_KEY);
             for(String s : SlaveMess.slaveList){
                 Slave slave = SlaveMess.getSlave(s);
                 String s2 = RSAUtil.decrypt(s1, slave.getPublicKey());
-               // ResponseModel responseModel = HttpUtils.sendPost()
+               // ResponseModel responseModel = HttpUtil.sendPost()
 
             }
         } catch (Exception e) {
@@ -61,7 +62,12 @@ public class TimeFunction {
             Slave slave = SlaveMess.getSlave(s);
             String ip = slave.getIP();
             String url = sb.append(preUrl).append(ip).append(lastUrl).toString();
-            ResponseModel responseModel = HttpUtils.sendGetToGetPic(url, null);
+            ResponseModel responseModel = null;
+            try {
+                responseModel = HttpUtil.sendGetModel(url, null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             if(responseModel == null){
                 del.add(ip);
             }else{
