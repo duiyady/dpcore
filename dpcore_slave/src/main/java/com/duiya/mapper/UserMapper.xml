@@ -2,5 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.duiya.dao.UserDao">
+    <select id="getUserKey" resultType="string">
+        select user_sskey from t_user where user_account=#{account} and user_password=#{pass}
+    </select>
 
 </mapper>

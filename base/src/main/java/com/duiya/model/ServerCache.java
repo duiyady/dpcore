@@ -9,6 +9,7 @@ public class ServerCache implements Serializable {
     private String IP;
     private String IPHASH6;
     private String BASEURL;
+    private Key PUBLICKEY;
 
     public Key getPUBLICKEY() {
         return PUBLICKEY;
@@ -17,8 +18,6 @@ public class ServerCache implements Serializable {
     public void setPUBLICKEY(Key PUBLICKEY) {
         this.PUBLICKEY = PUBLICKEY;
     }
-
-    private Key PUBLICKEY;
 
     public String getIP() {
         return IP;

@@ -6,25 +6,24 @@ import com.duiya.init.BaseConfig;
 import com.duiya.model.Location;
 import com.duiya.model.Picture;
 import com.duiya.model.Slave;
-import com.duiya.service.FileManageService;
+import com.duiya.service.FileService;
+import com.duiya.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import javax.servlet.ServletOutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Service
-public class FileManageServiceImpl implements FileManageService {
+public class FileServiceImpl implements FileService {
 
-    private Logger logger = LoggerFactory.getLogger(FileManageServiceImpl.class);
+    private Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
 
     @Autowired
     private FileDao fileDao;
@@ -33,14 +32,9 @@ public class FileManageServiceImpl implements FileManageService {
     private RedisCache redisCache;
 
     @Override
-    /**
-     * 普通用户保存图片，返回值是成功的数目
-     * 第一次存储服务器IP的Hash前6位/时间(xxxxyyzz格式)/分/UUID前8位+秒
-     */
-    public List<String> saveFile(String account, MultipartFile... multipartFiles) {
-        int flag = 0;
+    public Map<Integer, String> saveFile(String account, MultipartFile... multipartFiles) {
         List<Picture> data = new LinkedList<>();
-        List<String> result = new ArrayList<>();
+        Map<Integer, String> result = new HashMap<>();
         for(int i = 0; i < multipartFiles.length; i++){
             MultipartFile mf = multipartFiles[i];
             if(!mf.isEmpty()){
@@ -57,38 +51,56 @@ public class FileManageServiceImpl implements FileManageService {
                         ft.mkdirs();
                     }
                     mf.transferTo(ft);
-                    result.add(picture.getFileName());
                 } catch (IOException e) {
                     picture.setFileState("null");
                     logger.error("保存图片失败", e);
-                    flag = 1;
                 }
+                result.put(i, picture.getFileName());
                 data.add(picture);
             }
         }
-        if(flag == 1){
-            return null;
+        fileDao.save(data);
+        if(result.size() > 0){
+            return result;
         }else{
-            int res = fileDao.save(data);
-            if(res >= 1) {
-                return result;
-            }else{
-                return null;
-            }
+            return null;
         }
     }
 
     @Override
-    public byte[] getFile(String location) {
-        byte[] bFile = null;
-        try {
-            bFile = Files.readAllBytes(Paths.get(location));
-        } catch (IOException e) {
-            logger.error("获取图片失败", e);
-            e.printStackTrace();
-        }
+    public byte[] getFile(String location) throws IOException {
+        byte[] bFile = Files.readAllBytes(Paths.get(location));
         return bFile;
     }
+
+    @Override
+    public void getAndWriteFile(String path, ServletOutputStream outputStream) throws Exception {
+        BufferedInputStream bf = new BufferedInputStream(new FileInputStream(new File(path)));
+        byte[] temp = new byte[1024];
+        int len = 0;
+        while((len = bf.read(temp)) != -1){
+            outputStream.write(temp, 0, len);
+        }
+        if(bf != null){
+            bf.close();
+        }
+    }
+
+    @Override
+    public void getAndWriteFileL(ServletOutputStream outputStream, String path) throws Exception {
+        BufferedInputStream bf = new BufferedInputStream(new FileInputStream(new File(path)));
+        int available = bf.available();
+        outputStream.print(StringUtil.getLengthString(available, 10));
+        byte[] temp = new byte[1024];
+        int len = 0;
+        while((len = bf.read(temp)) != -1){
+            outputStream.write(temp, 0, len);
+        }
+        if(bf != null){
+            bf.close();
+        }
+    }
+
 
     @Override
     public void saveFile(MultipartFile... multipartFiles) {

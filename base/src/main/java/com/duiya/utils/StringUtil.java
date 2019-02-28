@@ -27,4 +27,21 @@ public class StringUtil {
             return true;
         }
     }
+
+    /**
+     * 将int转为长度的string
+     * @param value 要转的数字
+     * @param length 需要的长度
+     * @return
+     */
+    public static String getLengthString(int value, int length){
+        String a = String.valueOf(value);
+        StringBuffer sb = new StringBuffer();
+        for(int i = a.length(); i < length; i++){
+            sb.append(0);
+        }
+        sb.append(a);
+        return sb.toString();
+
+    }
 }

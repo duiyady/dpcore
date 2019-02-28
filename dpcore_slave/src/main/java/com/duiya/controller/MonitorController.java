@@ -3,7 +3,7 @@ package com.duiya.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.duiya.cache.RedisCache;
 import com.duiya.init.BaseConfig;
-import com.duiya.service.FileBackupService;
+import com.duiya.service.BackupService;
 import com.duiya.utils.RSAUtil;
 import com.duiya.utils.ResponseUtil;
 import org.slf4j.Logger;
@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("monitor")
 public class MonitorController {
 
-    private Logger logger = LoggerFactory.getLogger(CoreFileController.class);
+    private Logger logger = LoggerFactory.getLogger(MonitorController.class);
 
     @Autowired
     public RedisCache redisCache;
 
     @Autowired
-    public FileBackupService fileBackupService;
+    public BackupService backupService;
 
     //控制端检测服务器是否正常
     @RequestMapping(value = "alive", method = RequestMethod.GET)
@@ -56,7 +56,7 @@ public class MonitorController {
             return ResponseUtil.constructUnknownErrorResponse("failed");
         }
         if(s2.equals(ipHash6)){
-            fileBackupService.aync(last, now);
+            backupService.aync(last, now);
         }
         return ResponseUtil.constructOKResponse("success", null);
     }

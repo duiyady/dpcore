@@ -39,7 +39,7 @@ public class DataConfig {
         SqlSessionFactoryBean sqlSessionFactory = new SqlSessionFactoryBean();
         ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
         sqlSessionFactory.setDataSource(getBasicDataSource());
-        sqlSessionFactory.setMapperLocations(resourcePatternResolver.getResources("classpath:com/duiya/*/*.xml"));
+        sqlSessionFactory.setMapperLocations(resourcePatternResolver.getResources("classpath:com/duiya/mapper/*.xml"));
         return sqlSessionFactory;
     }
 

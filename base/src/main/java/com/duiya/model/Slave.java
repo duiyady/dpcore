@@ -11,6 +11,8 @@ public class Slave implements Serializable {
 
     private Key publicKey;
 
+    private String baseUrl;
+
     private int state;//1可用 2一次检测不到 3两次检测不到 4三次检测不到(移除) 10设置的不可用
 
     public int getState() {
@@ -35,6 +37,15 @@ public class Slave implements Serializable {
 
     public void setIP(String IP) {
         this.IP = IP;
+
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
     public Key getPublicKey() {

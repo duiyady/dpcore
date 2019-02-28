@@ -48,4 +48,24 @@ public class ResponseEnum {
      * 没有图片
      */
     public static final int NULL_PIC = -20;
+
+    /************************图片备份部分错误*************************/
+    /**
+     * 成功
+     */
+    public static final String PIC_BACKUPOK = "300";
+    /**
+     * 不符合规则的图片地址
+     */
+    public static final String ERROR_LOCATION = "301";
+
+    /**
+     * 没有发现图片
+     */
+    public static final String PIC_NOTFOUND = "302";
+
+    /**
+     * 未知错误
+     */
+    public static final String PIC_UNKNOWNERROR = "303";
 }

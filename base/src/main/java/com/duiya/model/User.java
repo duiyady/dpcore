@@ -22,13 +22,13 @@ public class User implements Serializable {
     /**
      * 用户公钥
      */
-    private String userSskey;
+    private String userKey;
 
-    public User(String userAccount, String userPassword, String userEmail, String userSskey) {
+    public User(String userAccount, String userPassword, String userEmail, String userKey) {
         this.userAccount = userAccount;
         this.userPassword = userPassword;
         this.userEmail = userEmail;
-        this.userSskey = userSskey;
+        this.userKey = userKey;
     }
 
     public User() {
@@ -40,7 +40,7 @@ public class User implements Serializable {
                 "userAccount='" + userAccount + '\'' +
                 ", userPassword='" + userPassword + '\'' +
                 ", userEmail='" + userEmail + '\'' +
-                ", userSskey='" + userSskey + '\'' +
+                ", userKey='" + userKey + '\'' +
                 '}';
     }
 
@@ -68,11 +68,11 @@ public class User implements Serializable {
         this.userEmail = userEmail;
     }
 
-    public String getUserSskey() {
-        return userSskey;
+    public String getUserKey() {
+        return userKey;
     }
 
-    public void setUserSskey(String userSskey) {
-        this.userSskey = userSskey;
+    public void setUserKey(String userKey) {
+        this.userKey = userKey;
     }
 }

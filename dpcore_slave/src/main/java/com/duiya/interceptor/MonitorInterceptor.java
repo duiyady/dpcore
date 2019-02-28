@@ -17,8 +17,8 @@ public class MonitorInterceptor extends HandlerInterceptorAdapter {
     @Override
     //preHandle方法，在请求发生前执行。
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (request.getRequestURI().contains("/fileop/upload")
-                || request.getRequestURI().contains("/fileop/get")) {
+        if (request.getRequestURI().contains("/file/upload")
+                || request.getRequestURI().contains("/file/get")) {
             long startTime = System.currentTimeMillis();
             request.setAttribute("startTime", startTime);
         }
@@ -28,8 +28,8 @@ public class MonitorInterceptor extends HandlerInterceptorAdapter {
     @Override
     //postHandle方法，在请求完成后执行。
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        if (request.getRequestURI().contains("/fileop/upload")
-                || request.getRequestURI().contains("/fileop/get")) {
+        if (request.getRequestURI().contains("/file/upload")
+                || request.getRequestURI().contains("/file/get")) {
             long startTime = (Long) request.getAttribute("startTime");
             request.removeAttribute("startTime");
             long endTime = System.currentTimeMillis();

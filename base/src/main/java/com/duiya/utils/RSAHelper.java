@@ -9,6 +9,7 @@ import sun.misc.BASE64Encoder;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.*;
@@ -258,6 +259,26 @@ public class RSAHelper {
         }
     }
 
+    public static List<Key> genKeyPair() throws NoSuchAlgorithmException {
+        /** RSA算法要求有一个可信任的随机数源 */
+        SecureRandom secureRandom = new SecureRandom();
+        /** 为RSA算法创建一个KeyPairGenerator对象 */
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        /** 利用上面的随机数据源初始化这个KeyPairGenerator对象 */
+        keyPairGenerator.initialize(1024, secureRandom);
+        /** 生成密匙对 */
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        /** 得到公钥 */
+        Key publicKey = keyPair.getPublic();
+        /** 得到私钥 */
+        Key privateKey = keyPair.getPrivate();
+
+        List<Key> list = new ArrayList<>();
+        list.add(publicKey);
+        list.add(privateKey);
+        return list;
+    }
+
     /**
      * 秘钥对
      */
@@ -300,7 +321,8 @@ public class RSAHelper {
         }
     }
 }
-class Temp{
+
+class temp{
     /**
      *  指定加密算法为RSA 
      */
@@ -312,70 +334,167 @@ class Temp{
 
     /**
      * 加密算法
-     * @param source 明文
-     * @param key 密钥
-     * @return 加密后的密文
-     * @throws Exception
+     *
+     * @param source 原始数据
+     * @param key
+     * @return
      */
-    public static String encrypt(String source, Key key) throws Exception {
+    public static String encrypt(String source, Key key)
+            throws NoSuchAlgorithmException, BadPaddingException, NoSuchPaddingException, IllegalBlockSizeException, InvalidKeyException {
+
+        BASE64Decoder decoder = new BASE64Decoder();
+        byte[] b;
+        try {
+            b = Base64.decode(source);
+        } catch (Base64DecodingException e) {
+            e.printStackTrace();
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        int index = 0;
+        byte[] temp = new byte[117];
+
+        while (((index + 1) * 117) <= b.length) {
+            for (int i = 0; i < 117; i++) {
+                temp[i] = b[index * 117 + i];
+            }
+            sb.append(encrypt(temp, key));
+            index++;
+        }
+        byte[] bb = new byte[b.length % 117];
+        for (int i = 0; 117 * index + i < b.length; i++) {
+            bb[i] = b[index * 117 + i];
+        }
+        sb.append(encrypt(bb, key));
+
+        return sb.toString();
+    }
+
+    /**
+     * 分段加密
+     *
+     * @param mess
+     * @param key
+     * @return
+     * @throws InvalidKeyException
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     */
+    private static String encrypt(byte[] mess, Key key) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException {
         /** 得到Cipher对象来实现对源数据的RSA加密 */
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, key);
-        byte[] b = source.getBytes();
-        /** 执行加密操作 */
-        byte[] b1 = cipher.doFinal(b);
+        byte[] b = cipher.doFinal(mess);
         BASE64Encoder encoder = new BASE64Encoder();
-        return encoder.encode(b1);
+        return encoder.encode(b);
     }
+
 
     /**
      * 解密算法
+     *
      * @param cryptograph 密文
      * @param key
-     * @return 解密后的明文
-     * @throws Exception
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws BadPaddingException
+     * @throws NoSuchPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidKeyException
      */
-    public static String decrypt(String cryptograph, Key key) throws Exception {
+    public static String decrypt(String cryptograph, Key key)
+            throws NoSuchAlgorithmException, BadPaddingException, NoSuchPaddingException, IllegalBlockSizeException, InvalidKeyException {
+
+        byte[] b;
+        try {
+            b = Base64.decode(cryptograph);
+        } catch (Base64DecodingException e) {
+            e.printStackTrace();
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        byte[] temp = new byte[128];
+        int index = 0;
+        while (((index + 1) * 128) <= b.length) {
+            for (int i = 0; i < 128; i++) {
+                temp[i] = b[index * 128 + i];
+            }
+            sb.append(decrypt(temp, key));
+            index++;
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 分段解密
+     *
+     * @param mess
+     * @param key
+     * @return
+     * @throws InvalidKeyException
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     */
+    private static String decrypt(byte[] mess, Key key) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException {
         /** 得到Cipher对象对已用公钥加密的数据进行RSA解密 */
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, key);
-        BASE64Decoder decoder = new BASE64Decoder();
-        byte[] b1 = decoder.decodeBuffer(cryptograph);
-
         /** 执行解密操作 */
-        byte[] b = cipher.doFinal(b1);
-        return new String(b);
+        byte[] b = cipher.doFinal(mess);
+        return Base64.encode(b);
     }
 
     /**
-     * 将String对象转换为Key对象
-     * @param str
-     * @return 这个String对应的key
-     * @throws Exception
-     * @throws IOException
+     * 获取公钥对象
+     *
+     * @param publicKeyBase64
+     * @return
+     * @throws InvalidKeySpecException
+     * @throws NoSuchAlgorithmException
      */
-    public static Key getKey(String str) throws Exception, IOException {
-        byte[] keyBytes;
-        keyBytes = (new BASE64Decoder()).decodeBuffer(str);
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
+    public static PublicKey getPublicKey(String publicKeyBase64)
+            throws InvalidKeySpecException, NoSuchAlgorithmException, Base64DecodingException {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PublicKey key = keyFactory.generatePublic(keySpec);
-        return key;
+        X509EncodedKeySpec publicpkcs8KeySpec = new X509EncodedKeySpec(Base64.decode(publicKeyBase64));
+        PublicKey publicKey = keyFactory.generatePublic(publicpkcs8KeySpec);
+        return publicKey;
     }
 
     /**
-     * 将key转为string
-     * @param key
-     * @return 这个key对应的String
+     * 获取私钥对象
+     *
+     * @param privateKeyBase64
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
      */
-    public static String getString(Key key){
+    public static PrivateKey getPrivateKey(String privateKeyBase64)
+            throws NoSuchAlgorithmException, InvalidKeySpecException, Base64DecodingException {
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PKCS8EncodedKeySpec privatekcs8KeySpec = new PKCS8EncodedKeySpec(Base64.decode(privateKeyBase64));
+        PrivateKey privateKey = keyFactory.generatePrivate(privatekcs8KeySpec);
+        return privateKey;
+    }
+
+    /**
+     * 将key换成String
+     *
+     * @param key
+     * @return
+     */
+    public static String getString(Key key) {
         byte[] keyBytes = key.getEncoded();
-        String keyBase64 = new BASE64Encoder().encode(keyBytes);
+        String keyBase64 = Base64.encode(keyBytes);
         return keyBase64;
     }
 
     /**
      * 生成公钥和私钥
+     *
      * @return list第一个是公钥，第二个是私钥
      * @throws NoSuchAlgorithmException
      */
@@ -399,3 +518,4 @@ class Temp{
         return list;
     }
 }
+
