@@ -1,10 +1,7 @@
 package com.duiya.model;
 
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class Location {
     private String IPHash6;
@@ -132,6 +129,22 @@ public class Location {
         .append(string.substring(6, 14)).append("/").append(string.substring(14, 16))
         .append("/").append(string.substring(16, 28));
         return sb.toString();
+    }
+
+    public static List<String> getPath(List<String> strings, String ROOT){
+        List<String> result = new ArrayList<>();
+        for(String s : strings){
+            result.add(getPath(s, ROOT));
+        }
+        return result;
+    }
+
+    public static Map<String, String> getFileMess(List<String> strings, String ROOT){
+        Map<String, String> res = new HashMap<>();
+        for(String s : strings){
+            res.put(s, getPath(s, ROOT));
+        }
+        return res;
     }
 
     /**

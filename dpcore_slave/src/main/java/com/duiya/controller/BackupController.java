@@ -103,10 +103,12 @@ public class BackupController {
     public JSONObject filePut(@RequestParam("file") MultipartFile[] multipartFiles,
                               HttpServletRequest request) {
         String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) ip = request.getHeader("Proxy-Client-IP");
+        if (ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown"))
+            ip = request.getHeader("Proxy-Client-IP");
         if (ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown"))
             ip = request.getHeader("WL-Proxy-Client-IP");
-        if (ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) ip = request.getRemoteAddr();
+        if (ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown"))
+            ip = request.getRemoteAddr();
         if (fileService.hasIp(ip)) {
             // 判断文件是否为空
             if (multipartFiles != null && multipartFiles.length >= 1) {

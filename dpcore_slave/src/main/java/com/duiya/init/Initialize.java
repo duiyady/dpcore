@@ -1,9 +1,8 @@
 package com.duiya.init;
 
+import com.duiya.model.ResponseModel;
 import com.duiya.model.ServerCache;
-import com.duiya.utils.PropertiesUtil;
-import com.duiya.utils.RSAUtil;
-import com.duiya.utils.RedisConnection;
+import com.duiya.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +10,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URLEncoder;
@@ -114,7 +114,6 @@ public class Initialize implements ServletContextListener {
             throw new RuntimeException("转码失败");
         }
 
-        /** 向主服务器注册
         ResponseModel responseModel = null;
         try {
             responseModel = HttpUtil.sendPostModel(registurl, param);
@@ -125,7 +124,6 @@ public class Initialize implements ServletContextListener {
         if(responseModel.getCode() != ResponseEnum.OK){
             throw new RuntimeException("向主服务器注册失败，slave异常");
         }
-         */
         logger.info("注册成功");
 
 

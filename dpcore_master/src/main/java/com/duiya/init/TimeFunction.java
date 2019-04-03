@@ -58,8 +58,7 @@ public class TimeFunction {
         String lastUrl = ":8080/dpcore-slave/monitor/alive";
         StringBuilder sb = new StringBuilder();
         //http://ip:8080/dpcore-slave/monitor/alive
-        for(String s : SlaveMess.slaveList){
-            Slave slave = SlaveMess.getSlave(s);
+        for(Slave slave : SlaveMess.slaves){
             String ip = slave.getIP();
             String url = sb.append(preUrl).append(ip).append(lastUrl).toString();
             ResponseModel responseModel = null;

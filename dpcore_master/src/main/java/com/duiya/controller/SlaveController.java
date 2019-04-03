@@ -49,7 +49,7 @@ public class SlaveController {
         if(ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) ip = request.getRemoteAddr();
 
         if(StringUtil.isBlank(flag, pubKeyStr, baseUrl) == true){
-            return ResponseUtil.constructArgErrorResponse("cnashubudui");
+            return ResponseUtil.constructArgErrorResponse("参数不对");
         }
         logger.info("invoke--------------------slave/regist?ip:" + ip);
         String ipHash6  = String.valueOf(ip.hashCode()).substring(0, 6);
@@ -72,7 +72,6 @@ public class SlaveController {
             slave.setBaseUrl(baseUrl);
             slave.setState(1);
             SlaveMess.addSlave(slave);
-            redisCache.putPerpetualListCache("slaves", SlaveMess.slaves);
             logger.info("invoke--------------------slave/regist?ip:" + ip +  "success");
             return ResponseUtil.constructOKResponse("success", null);
         }else{

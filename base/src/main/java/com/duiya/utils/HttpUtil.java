@@ -289,6 +289,14 @@ public class HttpUtil {
     }
 
 
+    /**
+     *
+     * @param urlStr
+     * @param messMap 数据参数
+     * @param fileMap 文件参数， key是数据库里面的  value是物理地址
+     * @param contentType
+     * @return
+     */
     public static ResponseModel sendPostImage(String urlStr, Map<String, String> messMap, Map<String, String> fileMap, String contentType){
         OutputStream out = null;
         String BOUNDARY = "---------------------------123821742118716";
@@ -333,22 +341,22 @@ public class HttpUtil {
                         continue;
                     }
                     File file = new File(inputValue);
-                    String filename = file.getName();
+                    String filename = inputName;
 
                     //没有传入文件类型，同时根据文件获取不到类型，默认采用image/png
                     contentType = "image/png";
                     //contentType非空采用filename匹配默认的图片类型
-                    if(!"".equals(contentType)){
-                        if (filename.endsWith(".png")) {
-                            contentType = "image/png";
-                        }else if (filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".jpe")) {
-                            contentType = "image/jpeg";
-                        }else if (filename.endsWith(".gif")) {
-                            contentType = "image/gif";
-                        }else if (filename.endsWith(".ico")) {
-                            contentType = "image/image/x-icon";
-                        }
-                    }
+//                    if(!"".equals(contentType)){
+//                        if (filename.endsWith(".png")) {
+//                            contentType = "image/png";
+//                        }else if (filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".jpe")) {
+//                            contentType = "image/jpeg";
+//                        }else if (filename.endsWith(".gif")) {
+//                            contentType = "image/gif";
+//                        }else if (filename.endsWith(".ico")) {
+//                            contentType = "image/image/x-icon";
+//                        }
+//                    }
                     if (contentType == null || "".equals(contentType)) {
                         contentType = "application/octet-stream";
                     }
@@ -380,7 +388,6 @@ public class HttpUtil {
             String res = sb.toString();
 
             in.close();
-            in = null;
             return JSONObject.parseObject(sb.toString(), ResponseModel.class);
         } catch (Exception e) {
             System.out.println("发送POST请求出错。" + urlStr);

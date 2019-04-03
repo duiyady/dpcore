@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.ServletOutputStream;
 import java.io.*;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -70,18 +69,20 @@ public class BackupServiceImpl implements BackupService {
         if(BaseConfig.RECENT_SYNCH < last){
             last = BaseConfig.RECENT_SYNCH;
         }
-        //这里的iphash6要换成
-        List<Map<String, String>> list = fileDao.getLocalRecentFile(last, now, "156800");
-        List<String> filePath = new ArrayList<>();
+        //这里的iphash6要换成,获取本机的图片
+        List<String> list = fileDao.getLocalRecentFile(last, now, "156800");
+        //List<String> filePath = Location.getPath(list, BaseConfig.ROOT_LOCATION);
+        Map<String, String> fileMess = Location.getFileMess(list, BaseConfig.ROOT_LOCATION);
 
         //获取所有的slave;
         List<Slave> slaveList = redisCache.getListCache("slaves", Slave.class);
-
-
-
-
-
-
+        for(Slave slave : slaveList){
+            if(!slave.getIPHash6().equals(BaseConfig.IPHASH6)) {
+                String baseurl = slave.getBaseUrl();
+                String urlstr = baseurl + "/" + "backup/put";
+                HttpUtil.sendPostImage(urlstr, null, fileMess, null);
+            }
+        }
     }
 
     @Override
