@@ -131,6 +131,13 @@ public class Location {
         return sb.toString();
     }
 
+    public String getPathNoName(String ROOT){
+        StringBuilder sb = new StringBuilder();
+        sb.append(ROOT).append(this.IPHash6).append("/")
+                .append(this.YMR).append("/").append(this.Min);
+        return sb.toString();
+    }
+
     public static List<String> getPath(List<String> strings, String ROOT){
         List<String> result = new ArrayList<>();
         for(String s : strings){
@@ -149,11 +156,11 @@ public class Location {
 
     /**
      * 生成文件名字及存路径和时间
-     * 服务器IP的Hash前6位/时间(xxxxyyzz格式)/分/时秒UUID前8位
+     * iphash6/时间(xxxxyyzz格式)/分/时秒UUID前8位
      * @return
      */
     public static List<Object> getFileName(String IPHASH6, String ROOT){
-        StringBuilder sbname = new StringBuilder(27);
+        StringBuilder sbname = new StringBuilder(28);
         StringBuilder sbpath = new StringBuilder(64);
         Calendar now = Calendar.getInstance();
         UUID uuid = UUID.randomUUID();

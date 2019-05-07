@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.duiya.init.BaseConfig;
 import com.duiya.model.Location;
 import com.duiya.service.FileService;
+import com.duiya.service.SlaveService;
 import com.duiya.utils.ResponseEnum;
 import com.duiya.utils.ResponseUtil;
 import org.slf4j.Logger;
@@ -27,6 +28,10 @@ public class BackupController {
     @Autowired
     private FileService fileService;
 
+    @Autowired
+    private SlaveService slaveService;
+
+
     /**
      * 其他服务器请求这个服务器文件
      * @param location
@@ -36,6 +41,7 @@ public class BackupController {
     @ResponseBody
     @CrossOrigin//跨域
     public void fileGet(@RequestParam("location") String location, HttpServletResponse response) {
+        logger.info("invoke--------------------backup/get?location:" + location);
         ServletOutputStream out = null;
         try {
             out = response.getOutputStream();
@@ -62,7 +68,7 @@ public class BackupController {
             if (!file.exists()) {
                 /*没有图片*/
                 try {
-                    out.print(ResponseEnum.PIC_NOTFOUND);
+                    out.println(ResponseEnum.PIC_NOTFOUND);
                     out.flush();
                 } catch (IOException e) {
                     logger.error("backup/get-->输出失败:", e);
@@ -70,8 +76,8 @@ public class BackupController {
                 return;
             }else {
                 try {
-                    out.print(ResponseEnum.PIC_BACKUPOK);
-                    out.print(location);
+                    out.println(ResponseEnum.PIC_BACKUPOK);
+                    out.println(location);
                     fileService.getAndWriteFileL(out, path);
                     out.flush();
                 } catch (Exception e) {
@@ -92,6 +98,32 @@ public class BackupController {
     }
 
     /**
+     * 其他服务器询问本机是否有这个文件
+     * @param location
+     * @return
+     */
+    @RequestMapping(value = "hasFile", method = RequestMethod.GET)
+    @ResponseBody
+    @CrossOrigin//跨域
+    public JSONObject hasFile(@RequestParam("location") String location){
+        logger.info("invoke--------------------backup/hasFile?location:" + location);
+        Location location1 = Location.getLocation(location);
+        if (location1 == null) {
+            return ResponseUtil.constructUnknownErrorResponse(null);
+        }else{
+            String path = location1.getPath(BaseConfig.ROOT_LOCATION);
+            File file = new File(path);
+            if(file.exists()){
+                return ResponseUtil.constructOKResponse(null, null);
+            }else{
+                return ResponseUtil.constructUnknownErrorResponse(null);
+            }
+        }
+    }
+
+
+
+    /**
      * 其他服务器向这个服务器传文件
      * @param multipartFiles
      * @param request
@@ -109,7 +141,7 @@ public class BackupController {
             ip = request.getHeader("WL-Proxy-Client-IP");
         if (ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown"))
             ip = request.getRemoteAddr();
-        if (fileService.hasIp(ip)) {
+        if (slaveService.hasIp(ip)) {
             // 判断文件是否为空
             if (multipartFiles != null && multipartFiles.length >= 1) {
                 try {

@@ -4,11 +4,15 @@ import com.duiya.model.ResponseModel;
 import com.duiya.model.Slave;
 import com.duiya.utils.HttpUtil;
 import com.duiya.utils.RSAUtil;
+import com.duiya.utils.ResponseEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,35 +20,47 @@ import java.util.List;
 /**
  * 定时发送看是否还存活
  */
-//@Service
+@Service
 public class TimeFunction {
     private Logger logger = LoggerFactory.getLogger(TimeFunction.class);
 
     /**
      * 每个30分钟同步数据
      */
-    @Scheduled(fixedRate = 1000 * 60 * 30) //通过@Scheduled声明该方法是计划任务，使用fixedRate属性每隔固定时间执行。
+    @Scheduled(fixedRate = 1000 * 60 * 1) //通过@Scheduled声明该方法是计划任务，使用fixedRate属性每隔固定时间执行。
     public void requestASYN() {
         Long now = new Date().getTime();
         BaseConfig.ASYNtime1 = BaseConfig.ASYNtime2;
         BaseConfig.ASYNtime2 = now;
 
         logger.info("-----------------开始同步----------------");
-        String preUrl = "http://";
-        String lastUrl = ":10086/dpcore-slave/monitor/sync";
-        StringBuilder sb = new StringBuilder();
-        //http://ip:8080/dpcore-slave/monitor/alive
-        try {
-            String s1 = RSAUtil.decrypt(BaseConfig.IPHASH6, BaseConfig.PRIVATE_KEY);
-            for(String s : SlaveMess.slaveList){
-                Slave slave = SlaveMess.getSlave(s);
-                String s2 = RSAUtil.decrypt(s1, slave.getPublicKey());
-               // ResponseModel responseModel = HttpUtil.sendPost()
-
+        String s1 = RSAUtil.encrypt(BaseConfig.IPHASH6, BaseConfig.PRIVATE_KEY);
+        String baseparam = "last=" + BaseConfig.ASYNtime1 + "&now=" + BaseConfig.ASYNtime2;
+        for(Slave slave : SlaveMess.slaves){
+            if(slave.getState() == 10 || slave.getState() == 1){
+                String baseurl = slave.getBaseUrl() + "/monitor/sync";
+                String s2 = RSAUtil.encrypt(s1, slave.getPublicKey());
+                System.out.println(s2);
+                String param = null;
+                try {
+                    param = baseparam + "&flag=" + URLEncoder.encode(s2,"utf8");
+                } catch (UnsupportedEncodingException e) {
+                    logger.error("转码失败");
+                }
+                ResponseModel responseModel = null;
+                try {
+                    responseModel = HttpUtil.sendPostModel(baseurl, param);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if(responseModel == null || responseModel.getCode() != ResponseEnum.OK){
+                    logger.error("通知同步失败---->"+ slave.getBaseUrl() + ":" + BaseConfig.ASYNtime1 + ">" + BaseConfig.ASYNtime2);
+                }else{
+                    logger.info("通知同步成功---->"+ slave.getBaseUrl() + ":" + BaseConfig.ASYNtime1 + ">" + BaseConfig.ASYNtime2);
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
     }
 
     /**
@@ -54,13 +70,11 @@ public class TimeFunction {
     public void isAlive() {
         logger.info("-----------------开始心跳检测----------------");
         List<String> del = new LinkedList<>();
-        String preUrl = "http://";
-        String lastUrl = ":8080/dpcore-slave/monitor/alive";
-        StringBuilder sb = new StringBuilder();
         //http://ip:8080/dpcore-slave/monitor/alive
         for(Slave slave : SlaveMess.slaves){
-            String ip = slave.getIP();
-            String url = sb.append(preUrl).append(ip).append(lastUrl).toString();
+            System.out.println(slave.getBaseUrl());
+            String url = slave.getBaseUrl() + "/monitor/alive";
+            String baseUrl = slave.getBaseUrl();
             ResponseModel responseModel = null;
             try {
                 responseModel = HttpUtil.sendGetModel(url, null);
@@ -68,26 +82,23 @@ public class TimeFunction {
                 e.printStackTrace();
             }
             if(responseModel == null){
-                del.add(ip);
+                if(slave.getState() == 10){
+                    slave.setState(2);
+                }else{
+                    slave.setState(slave.getState()+1);
+                    if(slave.getState() == 3){
+                        del.add(baseUrl);
+
+                    }
+                }
             }else{
-                logger.info(ip + "存活...........");
-                SlaveMess.getSlave(ip).setState(0);
+                logger.info(baseUrl + "存活...........");
+                SlaveMess.getSlave(baseUrl).setState(1);
             }
         }
         for(String s : del){
-            Slave slave = SlaveMess.getSlave(s);
-            int id = slave.getState();
-            if(id == 10){
-
-            }else{
-                id++;
-                if(id == 3){
-                    SlaveMess.delSlave(s);
-                    logger.info(s + "故障...........");
-                }else{
-                    slave.setState(id);
-                }
-            }
+            SlaveMess.delSlave(s);
+            logger.info(s + ":故障...........");
         }
     }
 

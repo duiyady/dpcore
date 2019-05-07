@@ -1,6 +1,8 @@
 package com.duiya.init;
 
 import com.duiya.model.ServerCache;
+import com.duiya.model.Slave;
+import com.duiya.utils.IPUtils;
 import com.duiya.utils.PropertiesUtil;
 import com.duiya.utils.RSAUtil;
 import com.duiya.utils.RedisConnection;
@@ -10,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -21,6 +21,7 @@ import java.util.List;
 public class Initialize implements ServletContextListener {
 
     private Logger logger = LoggerFactory.getLogger(Initialize.class);
+    public static PropertiesUtil propertiesUtil = new PropertiesUtil("dpcore-master.properties");
 
     @Override
     public void contextDestroyed(ServletContextEvent arg0) {
@@ -29,20 +30,20 @@ public class Initialize implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent arg0) {
-        PropertiesUtil propertiesUtil = new PropertiesUtil("dpcore-master.properties");
-
         try {
-            InetAddress addr = InetAddress.getLocalHost();
-            String s = addr.getHostAddress();
+            String s = propertiesUtil.getStringValue("dpcore.ip");
+            if(s == null){
+                s = IPUtils.getRealIp();
+            }
             BaseConfig.LOCAL_IP = s;
-            BaseConfig.IPHASH6 = String.valueOf(s.hashCode()).substring(0, 6);
-        } catch (UnknownHostException e) {
+        } catch (Exception e) {
             logger.error("获取本机IP失败", e);
             throw new RuntimeException("获取本机IP失败");
         }
 
         String url = propertiesUtil.getStringValue("dpcore.url");
         BaseConfig.LOCAL_URL = "http://" + BaseConfig.LOCAL_IP + url;
+        BaseConfig.IPHASH6 = String.valueOf(BaseConfig.LOCAL_URL.hashCode()).substring(0, 6);
 
         Boolean monitor = propertiesUtil.getBooleanValue("dpcore.monitor");
         if(monitor == null){
@@ -62,16 +63,28 @@ public class Initialize implements ServletContextListener {
             throw new RuntimeException("生成密钥失败");
         }
 
-        String redisip = propertiesUtil.getStringValue("redis.ip");
-        int redisport = propertiesUtil.getIntValue("redis.port");
-        String redispass = propertiesUtil.getStringValue("redis.password");
-        RedisConnection redisConnection = new RedisConnection(redisip, redisport, redispass);
+        BaseConfig.REDISIP = propertiesUtil.getStringValue("redis.ip");
+        BaseConfig.REDISPORT = propertiesUtil.getIntValue("redis.port");
+        BaseConfig.REDISPASS = propertiesUtil.getStringValue("redis.password");
+        BaseConfig.redisConnection = new RedisConnection(BaseConfig.REDISIP, BaseConfig.REDISPORT, BaseConfig.REDISPASS);
         ServerCache master = new ServerCache();
         master.setPUBLICKEY(BaseConfig.PUBLIC_KEY);
         master.setIP(BaseConfig.LOCAL_IP);
         master.setBASEURL(BaseConfig.LOCAL_URL);
         master.setIPHASH6(BaseConfig.IPHASH6);
-        redisConnection.set("master", master);
+        try {
+            BaseConfig.redisConnection.set("master", master);
+        } catch (Exception e) {
+            logger.error("缓存master失败", e);
+            throw new RuntimeException("缓存master失败");
+        }
+        try {
+            List<Slave> slaveList = BaseConfig.redisConnection.getList("slaves", Slave.class);
+            if(slaveList != null){
+                SlaveMess.slaves = slaveList;
+            }
+        } catch (Exception e) {
+        }
     }
 
 }

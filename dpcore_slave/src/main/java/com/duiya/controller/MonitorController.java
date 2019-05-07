@@ -46,16 +46,17 @@ public class MonitorController {
     public JSONObject sync(@RequestParam(value = "last") Long last,
                            @RequestParam(value = "now") Long now,
                            @RequestParam(value = "flag") String flag){
-        String ipHash6  = String.valueOf(BaseConfig.MASTER_IP.hashCode()).substring(0, 6);
+        logger.info("invoke--------------------monitor/sync?last:" + last + ",now:" + now);
+        //String ipHash6  = String.valueOf(BaseConfig.MASTER_IP.hashCode()).substring(0, 6);
         String s2 = null;
         try {
             String s1 = RSAUtil.decrypt(flag, BaseConfig.PRIVATE_KEY);
             s2 = RSAUtil.decrypt(s1, BaseConfig.MASTER_PUBLICKEY);
         } catch (Exception e) {
-            logger.error("未知错误");
+            logger.error("未知错误", e);
             return ResponseUtil.constructUnknownErrorResponse("failed");
         }
-        if(s2.equals(ipHash6)){
+        if(s2.equals(BaseConfig.MASTER_IPHASH6)){
             backupService.aync(last, now);
         }
         return ResponseUtil.constructOKResponse("success", null);

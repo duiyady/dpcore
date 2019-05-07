@@ -63,7 +63,7 @@ public class TestController {
 
     }
 
-    @RequestMapping(value = "testPost", method = RequestMethod.GET)
+    @RequestMapping(value = "testPost", method = RequestMethod.POST)
     @ResponseBody
     public JSONObject testPost(@RequestParam(value = "name", required = false) String name,
                                @RequestParam(value = "address", required = false) String address,

@@ -31,7 +31,7 @@ public class RedisCache {
 	 * @param obj
 	 * @return
 	 */
-	public <T> boolean putCache(String key, T obj) {
+	public <T> boolean putCache(String key, T obj) throws Exception{
 		final byte[] bkey = key.getBytes();
 		final byte[] bvalue = ProtoStuffSerializerUtil.serialize(obj);
 		boolean result = redisTemplate.execute(new RedisCallback<Boolean>() {
@@ -48,7 +48,7 @@ public class RedisCache {
 	 * @param obj
 	 * @param expireTime
 	 */
-	public <T> void putCacheWithExpireTime(String key, T obj, final long expireTime) {
+	public <T> void putCacheWithExpireTime(String key, T obj, final long expireTime) throws Exception{
 		final byte[] bkey = key.getBytes();
 		final byte[] bvalue = ProtoStuffSerializerUtil.serialize(obj);
 		redisTemplate.execute(new RedisCallback<Boolean>() {
@@ -65,7 +65,7 @@ public class RedisCache {
 	 * @param obj
 	 * @param <T>
 	 */
-	public <T> void putPerpetualCache(final String key, T obj){
+	public <T> void putPerpetualCache(final String key, T obj) throws Exception{
 		final byte[] bkey = key.getBytes();
 		final byte[] bvalue = ProtoStuffSerializerUtil.serialize(obj);
 		if(redisTemplate == null){
@@ -84,7 +84,7 @@ public class RedisCache {
 	 * @param objList
 	 * @return
 	 */
-	public <T> boolean putListCache(String key, List<T> objList) {
+	public <T> boolean putListCache(String key, List<T> objList) throws Exception{
 		final byte[] bkey = key.getBytes();
 		final byte[] bvalue = ProtoStuffSerializerUtil.serializeList(objList);
 		boolean result = redisTemplate.execute(new RedisCallback<Boolean>() {
@@ -102,7 +102,7 @@ public class RedisCache {
 	 * @param expireTime
 	 * @return
 	 */
-	public <T> boolean putListCacheWithExpireTime(String key, List<T> objList, final long expireTime) {
+	public <T> boolean putListCacheWithExpireTime(String key, List<T> objList, final long expireTime) throws Exception{
 		final byte[] bkey = key.getBytes();
 		final byte[] bvalue = ProtoStuffSerializerUtil.serializeList(objList);
 		boolean result = redisTemplate.execute(new RedisCallback<Boolean>() {
@@ -121,7 +121,7 @@ public class RedisCache {
 	 * @param <T>
 	 * @return
 	 */
-	public <T> boolean putPerpetualListCache(String key, List<T> objList){
+	public <T> boolean putPerpetualListCache(String key, List<T> objList) throws Exception{
 		final byte[] bkey = key.getBytes();
 		final byte[] bvalue = ProtoStuffSerializerUtil.serializeList(objList);
 		boolean result = redisTemplate.execute(new RedisCallback<Boolean>() {
@@ -139,7 +139,7 @@ public class RedisCache {
 	 * @param targetClass
 	 * @return
 	 */
-	public <T> T getCache(final String key, Class<T> targetClass) {
+	public <T> T getCache(final String key, Class<T> targetClass) throws Exception{
 		byte[] result = redisTemplate.execute(new RedisCallback<byte[]>() {
 			public byte[] doInRedis(RedisConnection connection) throws DataAccessException {
 				return connection.get(key.getBytes());
@@ -157,7 +157,7 @@ public class RedisCache {
 	 * @param targetClass
 	 * @return
 	 */
-	public <T> List<T> getListCache(final String key, Class<T> targetClass) {
+	public <T> List<T> getListCache(final String key, Class<T> targetClass) throws Exception{
 		byte[] result = redisTemplate.execute(new RedisCallback<byte[]>() {
 			public byte[] doInRedis(RedisConnection connection) throws DataAccessException {
 				return connection.get(key.getBytes());

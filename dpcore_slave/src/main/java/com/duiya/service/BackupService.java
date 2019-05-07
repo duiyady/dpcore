@@ -25,5 +25,5 @@ public interface BackupService {
      * @param location
      * @param outputStream
      */
-    void getAndWriteFile(Location location, String path, ServletOutputStream outputStream);
+    void getAndWriteFile(Location location, String path, ServletOutputStream outputStream) throws Exception;
 }

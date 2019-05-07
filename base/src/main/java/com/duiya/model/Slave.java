@@ -15,6 +15,10 @@ public class Slave implements Serializable {
 
     private int state;//1可用 2一次检测不到 3两次检测不到 4三次检测不到(移除) 10设置的不可用
 
+    public Slave() {
+        this.state = 1;
+    }
+
     public int getState() {
         return state;
     }

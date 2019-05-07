@@ -4,6 +4,7 @@ import com.duiya.cache.RedisCache;
 import com.duiya.dao.FileDao;
 import com.duiya.init.BaseConfig;
 import com.duiya.model.Location;
+import com.duiya.model.ResponseModel;
 import com.duiya.model.ServerCache;
 import com.duiya.model.Slave;
 import com.duiya.service.BackupService;
@@ -35,12 +36,22 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public byte[] getFile(Location location) {
-        String host = redisCache.getCache(location.getIPHash6(), String.class);
+        String host = null;
+        try {
+            host = redisCache.getCache(location.getIPHash6(), String.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if(host == null){
             return null;
         }
         String key = "slave" + location.getIPHash6();
-        ServerCache slave = redisCache.getCache(key, ServerCache.class);
+        ServerCache slave = null;
+        try {
+            slave = redisCache.getCache(key, ServerCache.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if(slave == null){
             return null;
         }
@@ -70,93 +81,88 @@ public class BackupServiceImpl implements BackupService {
             last = BaseConfig.RECENT_SYNCH;
         }
         //这里的iphash6要换成,获取本机的图片
-        List<String> list = fileDao.getLocalRecentFile(last, now, "156800");
-        //List<String> filePath = Location.getPath(list, BaseConfig.ROOT_LOCATION);
+        List<String> list = fileDao.getLocalRecentFile(last, now, BaseConfig.IPHASH6);
         Map<String, String> fileMess = Location.getFileMess(list, BaseConfig.ROOT_LOCATION);
 
         //获取所有的slave;
-        List<Slave> slaveList = redisCache.getListCache("slaves", Slave.class);
+        List<Slave> slaveList = null;
+        try {
+            slaveList = redisCache.getListCache("slaves", Slave.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         for(Slave slave : slaveList){
+            System.out.println(slave.getBaseUrl());
             if(!slave.getIPHash6().equals(BaseConfig.IPHASH6)) {
                 String baseurl = slave.getBaseUrl();
-                String urlstr = baseurl + "/" + "backup/put";
+                String urlstr = baseurl + "/backup/put";
                 HttpUtil.sendPostImage(urlstr, null, fileMess, null);
             }
         }
     }
 
     @Override
-    public void getAndWriteFile(Location location, String path, ServletOutputStream outputStream) {
-        String host = redisCache.getCache(location.getIPHash6(), String.class);
-        if(host == null){
-            return;
-        }
-        String key = "slave" + location.getIPHash6();
-        ServerCache slave = redisCache.getCache(key, ServerCache.class);
-        if(slave == null){
-            return;
-        }
-
-        String url = slave.getBASEURL() + "/backup/get";
-        String param = null;
-        try {
-            param = "location=" + URLEncoder.encode(location.getFull(), "utf8");
-        } catch (UnsupportedEncodingException e) {
-            logger.error("备份数据编码location失败:", e);
-        }
-        InputStream in = null;
-        BufferedReader bf = null;
-        BufferedWriter bfw = null;
-        try {
-            try {
-                in = HttpUtil.sendGetByte(url, param);
-            } catch (Exception e) {
-                logger.error("发送http get请求失败", e);
-                return;
+    public void getAndWriteFile(Location location, String path, ServletOutputStream outputStream) throws Exception {
+        List<Slave> slaves = redisCache.getListCache("slaves", Slave.class);
+        String param = "location=" + URLEncoder.encode(location.getFull(), "utf8");
+        boolean success = false;
+        if (slaves != null) {
+            System.out.println(BaseConfig.IPHASH6);
+            for(Slave slave : slaves){
+                System.out.println(slave.getIPHash6());
             }
-            if (in != null) {
-               bf = new BufferedReader(new InputStreamReader(in));
-                try {
-                    String flag = bf.readLine();
-                    if (flag != null && flag.equals(ResponseEnum.PIC_BACKUPOK)) {
-                        String lo = bf.readLine();
-                        if (lo.equals(location.getFull())) {
-                            File file = new File(path);
-                            bfw = new BufferedWriter(new FileWriter(file));
-                            String line = null;
-                            while ((line = bf.readLine()) != null) {
-                                outputStream.print(line);
-                                bfw.write(line);
+            for (Slave slave : slaves) {
+                //这个服务器不是本机
+                if (!(slave.getIPHash6().equals(BaseConfig.IPHASH6))) {
+                    String url = slave.getBaseUrl() + "/backup/hasFile";
+                    ResponseModel responseModel = HttpUtil.sendGetModel(url, param);
+                    //这个服务器有这个文件
+                    if (responseModel.getCode() == ResponseEnum.OK) {
+                        url = slave.getBaseUrl() + "/file/get";
+                        InputStream in = null;//对方服务器的额输入流
+                        OutputStream out = null;//写入本机的输入流
+                        try {
+                            in = HttpUtil.sendGetByte(url, param);
+                            if (in != null) {
+                                File file = new File(path);
+                                if(!file.exists()){
+                                    File tempf = new File(location.getPathNoName(BaseConfig.ROOT_LOCATION));
+                                    tempf.mkdirs();
+                                }
 
+                                byte[] bytes = new byte[1024];
+                                out = new BufferedOutputStream(new FileOutputStream(file));
+                                int len = 0;
+                                while((len = in.read(bytes)) != -1) {
+                                    outputStream.write(bytes, 0, len);
+                                    out.write(bytes, 0, len);
+                                }
+                                success = true;
+                                out.flush();
+                                out.close();
+
+                            } else {
+                                //输入流为空
                             }
-                            bfw.flush();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            if (out != null) {
+                                try {
+                                    out.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
-                        fileDao.updateState(location.getFull(), "," + BaseConfig.IPHASH6);
-                    } else {
-                        /*对方服务器也没有找到*/
-                        return;
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                }
+                //如果已经同步成功
+                if (success == true) {
+                    fileDao.updateState(location.getFull(), "," + BaseConfig.IPHASH6);
+                    break;
                 }
             }
-        }finally {
-            if(bf != null){
-                try {
-                    bf.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if(bfw != null){
-                try {
-                    bfw.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
         }
-        return;
     }
 }

@@ -52,7 +52,7 @@ public class SlaveController {
             return ResponseUtil.constructArgErrorResponse("参数不对");
         }
         logger.info("invoke--------------------slave/regist?ip:" + ip);
-        String ipHash6  = String.valueOf(ip.hashCode()).substring(0, 6);
+        String ipHash6  = String.valueOf(baseUrl.hashCode()).substring(0, 6);
         Key pubKey = null;
         String s2 = null;
         try {
@@ -64,7 +64,9 @@ public class SlaveController {
             e.printStackTrace();
             return ResponseUtil.constructUnknownErrorResponse("key error");
         }
-        if(s2 != null && s2.equals(ipHash6) || SlaveMess.getSlave(ipHash6) == null){
+
+
+        if(s2 != null && s2.equals(ipHash6)){
             Slave slave = new Slave();
             slave.setIP(ip);
             slave.setIPHash6(ipHash6);

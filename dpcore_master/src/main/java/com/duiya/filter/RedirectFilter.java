@@ -1,9 +1,11 @@
 package com.duiya.filter;
 
 
+import com.duiya.init.SlaveMess;
 import com.duiya.model.ResponseModel;
 import com.duiya.utils.HttpUtil;
 import com.duiya.utils.ResponseEnum;
+import com.duiya.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,20 +32,27 @@ public class RedirectFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         String uri = request.getRequestURI();
+        uri = StringUtil.getRealUri(uri);
         String method = request.getMethod();
         System.out.println("收到请求：" + request.getRequestURL());
         if (method.equalsIgnoreCase("get")) {
-            if (uri.contains("/fileop") || uri.contains("/user")) {
+            if (uri.contains("/file") || uri.contains("/user")) {
                 System.out.println("拦截到get请求重定向：" + request.getRequestURL());
                 String op = request.getQueryString();
-                String u = "http://localhost:10086/dpcore-slave" + uri + "?" + op;
-                try {
-                    response.sendRedirect(u);
-                } catch (IOException e) {
-                    logger.error("转发失败", e);
+                String slaveurl = SlaveMess.getFunctionSlave();
+                String u;
+                if(slaveurl != null) {
+                    u = slaveurl + uri + "?" + op;
+                    try {
+                        response.sendRedirect(u);
+                    } catch (IOException e) {
+                        logger.error("转发失败", e);
+                    }
+                }else{
+                    u = "";
                 }
                 return;
-            }else if(uri.contains("/testt")){
+            }else if(uri.contains("/test")){
                 Enumeration<String> hea = request.getHeaderNames();
                 while(hea.hasMoreElements()){
                     String name = hea.nextElement();
@@ -64,24 +73,30 @@ public class RedirectFilter implements Filter {
                 filterChain.doFilter(servletRequest, servletResponse);
             }
         } else if (method.equalsIgnoreCase("post")) {
-            if (uri.contains("/fileop") || uri.contains("/user")) {
-                String url = "http://localhost:10086/dpcore-slave" + uri;
-                ResponseModel responseModel = null;
-                try {
-                    responseModel = HttpUtil.transmitPost(url, request);
-                } catch (IOException e) {
-                    System.out.println("那个服务器不可用");
-                }
-                if (responseModel.getCode() != ResponseEnum.UNKNOEN_ERROR) {
+            if (uri.contains("/file") || uri.contains("/user")) {
+                String slaveurl = SlaveMess.getFunctionSlave();
+                System.out.println("选择的url:" + slaveurl);
+                if(slaveurl != null) {
+                    String url = slaveurl + uri;
+                    ResponseModel responseModel = null;
                     try {
-                        response.getOutputStream().print(responseModel.toString());
-                        response.getOutputStream().flush();
-                        response.getOutputStream().close();
+                        responseModel = HttpUtil.transmitPost(url, request);
                     } catch (IOException e) {
-                        logger.error("转发失败");
+                        System.out.println("那个服务器不可用");
                     }
+                    if (responseModel.getCode() != ResponseEnum.UNKNOEN_ERROR) {
+                        try {
+                            response.getOutputStream().print(responseModel.toString());
+                            response.getOutputStream().flush();
+                            response.getOutputStream().close();
+                        } catch (IOException e) {
+                            logger.error("转发失败");
+                        }
+                    }
+                }else{
+                    response.getWriter().write("{\"code\": -5,\"msg\":\"系统发生错误\",\"data\": \"\"}");
                 }
-            }else if(uri.contains("/testt")){
+            }else if(uri.contains("/test")){
                 Enumeration<String> hea = request.getHeaderNames();
                 while(hea.hasMoreElements()){
                     String name = hea.nextElement();

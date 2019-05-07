@@ -1,5 +1,7 @@
 package com.duiya.init;
 
+import com.duiya.utils.RedisConnection;
+
 import java.security.Key;
 import java.util.Date;
 
@@ -25,7 +27,7 @@ public class BaseConfig {
     public static String LOCAL_URL;
 
     /**
-     * 本机的IP hash 前6位
+     * 本机的IP+url hash前6位
      */
     public static String IPHASH6;
 
@@ -49,5 +51,10 @@ public class BaseConfig {
      */
     public static long ASYNtime2 = new Date().getTime();
 
+    public static String REDISIP;
+    public static int REDISPORT;
+    public static String REDISPASS;
+
+    public static RedisConnection redisConnection;
 
 }

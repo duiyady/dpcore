@@ -14,7 +14,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {SpringMvcConfig.class, DataConfig.class, TaskExecutorConfig.class})
@@ -32,10 +31,8 @@ public class FileTest {
         Long la = new Long("1547976210216");
         //backupService.aync(la, now);
 
-        List<Map<String, String>> list = fileDao.getLocalRecentFile(la, now,"156800");
-        for(Map<String, String> map : list){
-            System.out.println(map.toString());
-        }
+        List<String> list = fileDao.getLocalRecentFile(la, now,"156800");
+
 
     }
 }

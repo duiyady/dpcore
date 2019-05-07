@@ -5,7 +5,6 @@ import com.duiya.dao.FileDao;
 import com.duiya.init.BaseConfig;
 import com.duiya.model.Location;
 import com.duiya.model.Picture;
-import com.duiya.model.Slave;
 import com.duiya.service.FileService;
 import com.duiya.utils.StringUtil;
 import org.slf4j.Logger;
@@ -15,10 +14,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -68,12 +71,6 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public byte[] getFile(String location) throws IOException {
-        byte[] bFile = Files.readAllBytes(Paths.get(location));
-        return bFile;
-    }
-
-    @Override
     public void getAndWriteFile(String path, ServletOutputStream outputStream) throws Exception {
         BufferedInputStream bf = new BufferedInputStream(new FileInputStream(new File(path)));
         byte[] temp = new byte[1024];
@@ -90,7 +87,7 @@ public class FileServiceImpl implements FileService {
     public void getAndWriteFileL(ServletOutputStream outputStream, String path) throws Exception {
         BufferedInputStream bf = new BufferedInputStream(new FileInputStream(new File(path)));
         int available = bf.available();
-        outputStream.print(StringUtil.getLengthString(available, 10));
+        outputStream.println(StringUtil.getLengthString(available, 10));
         byte[] temp = new byte[1024];
         int len = 0;
         while((len = bf.read(temp)) != -1){
@@ -121,18 +118,5 @@ public class FileServiceImpl implements FileService {
                 }
             }
         }
-    }
-
-    @Override
-    public boolean hasIp(String ip) {
-        List<Slave> slaves = redisCache.getListCache("slaves", Slave.class);
-        if(slaves != null){
-            for(int i = 0; i < slaves.size(); i++){
-                if(slaves.get(i).getIP().equals(ip)){
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }

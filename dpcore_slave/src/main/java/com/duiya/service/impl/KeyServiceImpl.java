@@ -29,11 +29,16 @@ public class KeyServiceImpl implements KeyService {
     }
 
     @Override
-    public boolean verify(String account, String key) {
+    public boolean verify(String account, String key){
         if(key.length() != FLAG_LENGTH){
             return false;
         }
-        String temp = redisCache.getCache("upf" + account, String.class);
+        String temp = null;
+        try {
+            temp = redisCache.getCache("upf" + account, String.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if(temp != null && key.equals(temp)){
             return true;
         }
@@ -49,7 +54,11 @@ public class KeyServiceImpl implements KeyService {
             String uuid = UUID.randomUUID().toString();
             Key key = RSAUtil.getPublicKey(keyS);
             String miwen = RSAUtil.encrypt(uuid, key);
-            redisCache.putCache("upf" + account, String.class);
+            try {
+                redisCache.putCache("upf" + account, String.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return miwen;
         }
     }

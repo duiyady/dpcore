@@ -1,4 +1,4 @@
-package com.duiya.init;
+package com.test.model;
 
 import com.duiya.model.Escala;
 import com.duiya.model.Slave;
@@ -9,6 +9,7 @@ import java.util.List;
 
 @Component
 public class SlaveMess {
+
     public static List<Slave> slaves = new ArrayList<>();
 
     /**
@@ -49,11 +50,7 @@ public class SlaveMess {
             temp.setPublicKey(slave.getPublicKey());
             temp.setIPHash6(slave.getIPHash6());
         }
-        try {
-            BaseConfig.redisConnection.setList("slaves", SlaveMess.slaves);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        //redisCache.putPerpetualListCache("slaves", SlaveMess.slaves);
     }
 
     /**
@@ -89,25 +86,21 @@ public class SlaveMess {
         if(flag != -1){
             slaves.remove(flag);
         }
-        try {
-            BaseConfig.redisConnection.setList("slaves", SlaveMess.slaves);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        //redisCache.putPerpetualListCache("slaves", SlaveMess.slaves);
     }
 
     public static synchronized String getFunctionSlave(){
         Slave slave = null;
         int count = slaves.size();
-
+        for(Slave slave1 : slaves){
+            System.out.println(slave1.toString());
+        }
         while(slave == null && count > 0){
             if(index >= slaves.size()){
                 index = 0;
             }
             slave = slaves.get(index);
             if(!(slave.getState() == 1)){
-                System.out.println(slave.getState());
-                System.out.println("error");
                 slave = null;
             }
             index++;

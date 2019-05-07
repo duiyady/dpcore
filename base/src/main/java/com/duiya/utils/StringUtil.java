@@ -42,6 +42,18 @@ public class StringUtil {
         }
         sb.append(a);
         return sb.toString();
+    }
 
+    /**
+     * 将有项目的uri换为纯api
+     * @param uri
+     * @return
+     */
+    public static String getRealUri(String uri){
+        if(uri.contains("dpcore")){
+            String[] te = uri.split("/", 3);
+            uri = "/" + te[2];
+        }
+        return uri;
     }
 }

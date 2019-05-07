@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +30,6 @@ import java.util.Map;
 @CrossOrigin
 public class FileController {
 
-    //logger.info("invoke--------------------mflower/addFlower?flower:"+flower);
     private Logger logger = LoggerFactory.getLogger(FileController.class);
 
     @Autowired
@@ -56,6 +54,8 @@ public class FileController {
                                  @RequestParam(value = "account") String account,
                                  @RequestParam(value = "flag", required = false) String flag) {
 
+
+        logger.info("invokeinvoke--------------------file/upload?account:" + account + ",flag:" + flag);
 
         /*是否需要验证*/
         if (BaseConfig.VERIFIED) {
@@ -95,13 +95,14 @@ public class FileController {
     /**
      * 获取文件
      * @param location
-     * @param httpServletRequest
      * @param httpServletResponse
      * @return
      */
     @RequestMapping(value = "get", method = RequestMethod.GET)
     @ResponseBody
-    public void fileGet(@RequestParam("location") String location, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public void fileGet(@RequestParam("location") String location, HttpServletResponse httpServletResponse) {
+
+        logger.info("invoke--------------------file/get?location:" + location);
 
         Location location1 = Location.getLocation(location);
         //图片地址不符合规范
@@ -163,6 +164,7 @@ public class FileController {
     @RequestMapping(value = "getFlag", method = RequestMethod.POST)
     @ResponseBody
     public JSONObject getFlag(@RequestParam("account")String account, @RequestParam("pass")String pass){
+        logger.info("invoke--------------------file/getFlag?account:" + account);
         try {
             String flag = keyService.getUploadFlag(account, pass);
             if(flag == null){

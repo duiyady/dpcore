@@ -24,6 +24,11 @@ public class BaseConfig {
     public static String MASTER_URL;
 
     /**
+     * master的iphash6
+     */
+    public static String MASTER_IPHASH6;
+
+    /**
      * 本机IP
      */
     public static String LOCAL_IP;
@@ -34,7 +39,7 @@ public class BaseConfig {
     public static String LOCAL_URL;
 
     /**
-     * 本机的IP hash 前6位
+     * 本机的IP+url的hash前6位，为了防止一个主机跑多个服务
      */
     public static String IPHASH6;
 
@@ -62,5 +67,10 @@ public class BaseConfig {
      * 私钥
      */
     public static Key PRIVATE_KEY;
+
+    public static String REDISIP;
+    public static int REDISPORT;
+    public static String REDISPASS;
+
 
 }

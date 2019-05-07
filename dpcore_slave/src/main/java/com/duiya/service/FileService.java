@@ -3,11 +3,9 @@ package com.duiya.service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
-import java.io.IOException;
 import java.util.Map;
 
 public interface FileService {
-    //void test();
 
     /**
      * 保存图片
@@ -16,13 +14,6 @@ public interface FileService {
      * @return
      */
     Map<Integer, String> saveFile(String account, MultipartFile... multipartFiles);
-
-    /**
-     * 获取本机图片
-     * @param location
-     * @return
-     */
-    byte[] getFile(String location) throws IOException;
 
     /**
      * 获取本机图片写入输出流
@@ -41,5 +32,4 @@ public interface FileService {
 
     void saveFile(MultipartFile... multipartFiles);
 
-    boolean hasIp(String ip);
 }
