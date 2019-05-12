@@ -298,8 +298,8 @@ public class HttpUtil {
      * @return
      */
     public static ResponseModel sendPostImage(String urlStr, Map<String, String> messMap, Map<String, String> fileMap, String contentType){
-        OutputStream out = null;
-        String BOUNDARY = "---------------------------123821742118716";
+        DataOutputStream out = null;
+        String BOUNDARY = "----WebKitFormBoundaryXHSA8cv34gLSI3UH";
         try {
             URL url = new URL(urlStr);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -313,6 +313,7 @@ public class HttpUtil {
             conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; zh-CN; rv:1.9.2.6)");
             conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + BOUNDARY);
             out = new DataOutputStream(conn.getOutputStream());
+
             // text
             if (messMap != null) {
                 StringBuffer strBuf = new StringBuffer();
@@ -328,7 +329,7 @@ public class HttpUtil {
                     strBuf.append("Content-Disposition: form-data; name=\"" + inputName + "\"\r\n\r\n");
                     strBuf.append(inputValue);
                 }
-                out.write(strBuf.toString().getBytes());
+                out.write(strBuf.toString().getBytes("utf8"));
             }
             // file
             if (fileMap != null) {
@@ -362,19 +363,21 @@ public class HttpUtil {
                     }
                     StringBuffer strBuf = new StringBuffer();
                     strBuf.append("\r\n").append("--").append(BOUNDARY).append("\r\n");
-                    strBuf.append("Content-Disposition: form-data; name=\"" + inputName + "\"; filename=\"" + filename + "\"\r\n");
+                    strBuf.append("Content-Disposition: form-data; name=\"" + "file" + "\"; filename=\"" + filename + "\"\r\n");
                     strBuf.append("Content-Type:" + contentType + "\r\n\r\n");
-                    out.write(strBuf.toString().getBytes());
+                    out.write(strBuf.toString().getBytes("utf8"));
                     DataInputStream in = new DataInputStream(new FileInputStream(file));
                     int bytes = 0;
                     byte[] bufferOut = new byte[1024];
                     while ((bytes = in.read(bufferOut)) != -1) {
                         out.write(bufferOut, 0, bytes);
                     }
+                    out.flush();
                     in.close();
                 }
             }
-            byte[] endData = ("\r\n--" + BOUNDARY + "--\r\n").getBytes();
+
+            byte[] endData = ("\r\n--" + BOUNDARY + "--\r\n").getBytes("utf8");
             out.write(endData);
             out.flush();
             out.close();

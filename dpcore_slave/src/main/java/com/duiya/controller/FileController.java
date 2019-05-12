@@ -134,7 +134,7 @@ public class FileController {
             os.flush();
             os.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return;
 

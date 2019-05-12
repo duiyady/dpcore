@@ -12,9 +12,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import java.util.Date;
-import java.util.List;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {SpringMvcConfig.class, DataConfig.class, TaskExecutorConfig.class})
 @WebAppConfiguration
@@ -27,12 +24,6 @@ public class FileTest {
     private FileDao fileDao;
     @Test
     public void fileTest(){
-        Long now = new Date().getTime();
-        Long la = new Long("1547976210216");
-        //backupService.aync(la, now);
-
-        List<String> list = fileDao.getLocalRecentFile(la, now,"156800");
-
-
+        backupService.aync( 1557244660109L, 1557244720104L);
     }
 }

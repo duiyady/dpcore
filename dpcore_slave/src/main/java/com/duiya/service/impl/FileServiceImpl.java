@@ -104,16 +104,17 @@ public class FileServiceImpl implements FileService {
         for(int i = 0; i < multipartFiles.length; i++){
             MultipartFile mf = multipartFiles[i];
             if(!mf.isEmpty()){
-                String contentType=mf.getContentType();
-                String imageName = contentType.substring(contentType.indexOf("/")+1);
+                String imageName = mf.getOriginalFilename();
                 String filePath = Location.getPath(imageName, BaseConfig.ROOT_LOCATION);
+                System.out.println(filePath);
                 try {
                     File ft = new File(filePath);
                     if(!ft.exists()){
                         ft.mkdirs();
+                        mf.transferTo(ft);
                     }
-                    mf.transferTo(ft);
                 } catch (IOException e) {
+                    e.printStackTrace();
                     logger.error("保存图片失败", e);
                 }
             }

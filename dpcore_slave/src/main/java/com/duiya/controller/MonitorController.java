@@ -47,7 +47,6 @@ public class MonitorController {
                            @RequestParam(value = "now") Long now,
                            @RequestParam(value = "flag") String flag){
         logger.info("invoke--------------------monitor/sync?last:" + last + ",now:" + now);
-        //String ipHash6  = String.valueOf(BaseConfig.MASTER_IP.hashCode()).substring(0, 6);
         String s2 = null;
         try {
             String s1 = RSAUtil.decrypt(flag, BaseConfig.PRIVATE_KEY);

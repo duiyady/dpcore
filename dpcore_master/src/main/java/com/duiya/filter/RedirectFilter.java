@@ -52,7 +52,7 @@ public class RedirectFilter implements Filter {
                     u = "";
                 }
                 return;
-            }else if(uri.contains("/test")){
+            }else if(uri.contains("/hhh")){
                 Enumeration<String> hea = request.getHeaderNames();
                 while(hea.hasMoreElements()){
                     String name = hea.nextElement();
@@ -68,8 +68,8 @@ public class RedirectFilter implements Filter {
                 System.out.println(sb.toString());
                 System.out.println(request.getQueryString());
                 response.getOutputStream().print("success");
-
             }else{
+                System.out.println("get放行");
                 filterChain.doFilter(servletRequest, servletResponse);
             }
         } else if (method.equalsIgnoreCase("post")) {
@@ -96,7 +96,7 @@ public class RedirectFilter implements Filter {
                 }else{
                     response.getWriter().write("{\"code\": -5,\"msg\":\"系统发生错误\",\"data\": \"\"}");
                 }
-            }else if(uri.contains("/test")){
+            }else if(uri.contains("/hhh")){
                 Enumeration<String> hea = request.getHeaderNames();
                 while(hea.hasMoreElements()){
                     String name = hea.nextElement();
@@ -110,9 +110,8 @@ public class RedirectFilter implements Filter {
                     sb.append(lin);
                 }
                 System.out.println(sb.toString());
-                response.getOutputStream().print("success");
-
             }else {
+                System.out.println("post 放行");
                 filterChain.doFilter(servletRequest, servletResponse);
             }
         }else {

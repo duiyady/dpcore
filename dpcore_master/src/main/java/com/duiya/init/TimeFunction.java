@@ -40,7 +40,6 @@ public class TimeFunction {
             if(slave.getState() == 10 || slave.getState() == 1){
                 String baseurl = slave.getBaseUrl() + "/monitor/sync";
                 String s2 = RSAUtil.encrypt(s1, slave.getPublicKey());
-                System.out.println(s2);
                 String param = null;
                 try {
                     param = baseparam + "&flag=" + URLEncoder.encode(s2,"utf8");
@@ -51,7 +50,7 @@ public class TimeFunction {
                 try {
                     responseModel = HttpUtil.sendPostModel(baseurl, param);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
                 if(responseModel == null || responseModel.getCode() != ResponseEnum.OK){
                     logger.error("通知同步失败---->"+ slave.getBaseUrl() + ":" + BaseConfig.ASYNtime1 + ">" + BaseConfig.ASYNtime2);
@@ -72,14 +71,13 @@ public class TimeFunction {
         List<String> del = new LinkedList<>();
         //http://ip:8080/dpcore-slave/monitor/alive
         for(Slave slave : SlaveMess.slaves){
-            System.out.println(slave.getBaseUrl());
             String url = slave.getBaseUrl() + "/monitor/alive";
             String baseUrl = slave.getBaseUrl();
             ResponseModel responseModel = null;
             try {
                 responseModel = HttpUtil.sendGetModel(url, null);
             } catch (IOException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
             if(responseModel == null){
                 if(slave.getState() == 10){
@@ -88,7 +86,6 @@ public class TimeFunction {
                     slave.setState(slave.getState()+1);
                     if(slave.getState() == 3){
                         del.add(baseUrl);
-
                     }
                 }
             }else{

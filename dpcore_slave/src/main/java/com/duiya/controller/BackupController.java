@@ -64,7 +64,6 @@ public class BackupController {
 
             String path = location1.getPath(BaseConfig.ROOT_LOCATION);
             File file = new File(path);
-            byte[] img = null;
             if (!file.exists()) {
                 /*没有图片*/
                 try {
@@ -141,7 +140,7 @@ public class BackupController {
             ip = request.getHeader("WL-Proxy-Client-IP");
         if (ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown"))
             ip = request.getRemoteAddr();
-        if (slaveService.hasIp(ip)) {
+        //if (slaveService.hasIp(ip)) {
             // 判断文件是否为空
             if (multipartFiles != null && multipartFiles.length >= 1) {
                 try {
@@ -153,7 +152,7 @@ public class BackupController {
             } else {
                 return ResponseUtil.constructArgErrorResponse("the file is empty");
             }
-        }
+        //}
         return ResponseUtil.constructArgErrorResponse("unknown hosts");
     }
 

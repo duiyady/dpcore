@@ -81,7 +81,9 @@ public class BackupServiceImpl implements BackupService {
             last = BaseConfig.RECENT_SYNCH;
         }
         //这里的iphash6要换成,获取本机的图片
-        List<String> list = fileDao.getLocalRecentFile(last, now, BaseConfig.IPHASH6);
+        List<String> list = null;
+        list = fileDao.getLocalRecentFile(last, now, BaseConfig.IPHASH6);
+
         Map<String, String> fileMess = Location.getFileMess(list, BaseConfig.ROOT_LOCATION);
 
         //获取所有的slave;
@@ -92,11 +94,13 @@ public class BackupServiceImpl implements BackupService {
             e.printStackTrace();
         }
         for(Slave slave : slaveList){
-            System.out.println(slave.getBaseUrl());
             if(!slave.getIPHash6().equals(BaseConfig.IPHASH6)) {
+                logger.info("invoke--------------------backupservice/aync?" + last + "--->" + now + slave.getBaseUrl());
                 String baseurl = slave.getBaseUrl();
                 String urlstr = baseurl + "/backup/put";
                 HttpUtil.sendPostImage(urlstr, null, fileMess, null);
+                logger.info("success--------------------backupservice/aync?" + last + "--->" + now + slave.getBaseUrl());
+
             }
         }
     }
@@ -107,10 +111,6 @@ public class BackupServiceImpl implements BackupService {
         String param = "location=" + URLEncoder.encode(location.getFull(), "utf8");
         boolean success = false;
         if (slaves != null) {
-            System.out.println(BaseConfig.IPHASH6);
-            for(Slave slave : slaves){
-                System.out.println(slave.getIPHash6());
-            }
             for (Slave slave : slaves) {
                 //这个服务器不是本机
                 if (!(slave.getIPHash6().equals(BaseConfig.IPHASH6))) {
@@ -165,4 +165,5 @@ public class BackupServiceImpl implements BackupService {
             }
         }
     }
+
 }

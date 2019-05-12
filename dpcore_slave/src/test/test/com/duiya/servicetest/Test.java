@@ -1,12 +1,18 @@
 package com.duiya.servicetest;
 
-import java.io.IOException;
+import com.duiya.model.Slave;
+import com.duiya.utils.RedisConnection;
+
+import java.util.List;
 
 public class Test {
-    public static void main(String[] args) throws IOException {
-        String ss = "127.0.0.1:10096/dpcore_slave";
-        String s = String.valueOf(ss.hashCode());
-        System.out.println(s);
+    public static void main(String[] args) throws Exception {
+        RedisConnection redisConnection = new RedisConnection("123.207.243.135", 6379, "duiyady.");
+        List<Slave> slaveList = redisConnection.getList("slaves", Slave.class);
+        for(Slave slave : slaveList){
+            System.out.println(slave.getIPHash6() + "=" + slave.getIP() + "=" + slave.getBaseUrl());
+
+        }
 
     }
 

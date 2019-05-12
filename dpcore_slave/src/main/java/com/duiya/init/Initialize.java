@@ -131,8 +131,6 @@ public class Initialize implements ServletContextListener {
         }
         logger.info("注册成功");
 
-        System.out.println(BaseConfig.IPHASH6);
-        System.out.println(BaseConfig.LOCAL_URL);
     }
 
 }
