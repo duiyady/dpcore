@@ -142,6 +142,7 @@ public class BackupController {
             ip = request.getRemoteAddr();
         //if (slaveService.hasIp(ip)) {
             // 判断文件是否为空
+        System.out.println("进来了");
             if (multipartFiles != null && multipartFiles.length >= 1) {
                 try {
                     fileService.saveFile(multipartFiles);

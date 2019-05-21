@@ -2,7 +2,7 @@ package com.duiya.init;
 
 import com.duiya.model.ResponseModel;
 import com.duiya.model.Slave;
-import com.duiya.utils.HttpUtil;
+import com.duiya.service.MonitorService;
 import com.duiya.utils.RSAUtil;
 import com.duiya.utils.ResponseEnum;
 import org.slf4j.Logger;
@@ -10,9 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,20 +35,7 @@ public class TimeFunction {
         String baseparam = "last=" + BaseConfig.ASYNtime1 + "&now=" + BaseConfig.ASYNtime2;
         for(Slave slave : SlaveMess.slaves){
             if(slave.getState() == 10 || slave.getState() == 1){
-                String baseurl = slave.getBaseUrl() + "/monitor/sync";
-                String s2 = RSAUtil.encrypt(s1, slave.getPublicKey());
-                String param = null;
-                try {
-                    param = baseparam + "&flag=" + URLEncoder.encode(s2,"utf8");
-                } catch (UnsupportedEncodingException e) {
-                    logger.error("转码失败");
-                }
-                ResponseModel responseModel = null;
-                try {
-                    responseModel = HttpUtil.sendPostModel(baseurl, param);
-                } catch (IOException e) {
-                    //e.printStackTrace();
-                }
+                ResponseModel responseModel = MonitorService.requestASYN(slave, baseparam, s1);
                 if(responseModel == null || responseModel.getCode() != ResponseEnum.OK){
                     logger.error("通知同步失败---->"+ slave.getBaseUrl() + ":" + BaseConfig.ASYNtime1 + ">" + BaseConfig.ASYNtime2);
                 }else{
@@ -69,16 +53,9 @@ public class TimeFunction {
     public void isAlive() {
         logger.info("-----------------开始心跳检测----------------");
         List<String> del = new LinkedList<>();
-        //http://ip:8080/dpcore-slave/monitor/alive
         for(Slave slave : SlaveMess.slaves){
-            String url = slave.getBaseUrl() + "/monitor/alive";
             String baseUrl = slave.getBaseUrl();
-            ResponseModel responseModel = null;
-            try {
-                responseModel = HttpUtil.sendGetModel(url, null);
-            } catch (IOException e) {
-                //e.printStackTrace();
-            }
+            ResponseModel responseModel = MonitorService.isAlive(slave);
             if(responseModel == null){
                 if(slave.getState() == 10){
                     slave.setState(2);

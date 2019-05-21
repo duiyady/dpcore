@@ -1,7 +1,9 @@
 package com.duiya.init;
 
+import com.duiya.model.ResponseModel;
 import com.duiya.model.ServerCache;
 import com.duiya.model.Slave;
+import com.duiya.service.MonitorService;
 import com.duiya.utils.IPUtils;
 import com.duiya.utils.PropertiesUtil;
 import com.duiya.utils.RSAUtil;
@@ -21,15 +23,17 @@ import java.util.List;
 public class Initialize implements ServletContextListener {
 
     private Logger logger = LoggerFactory.getLogger(Initialize.class);
+
     public static PropertiesUtil propertiesUtil = new PropertiesUtil("dpcore-master.properties");
 
     @Override
     public void contextDestroyed(ServletContextEvent arg0) {
-        // RedisCache redisCache = new RedisCache();
+        BaseConfig.redisConnection.del("master");
     }
 
     @Override
     public void contextInitialized(ServletContextEvent arg0) {
+        /**解析是否设置了ip，若没有设置ip,那用java api获取的是局域网ip*/
         try {
             String s = propertiesUtil.getStringValue("dpcore.ip");
             if(s == null){
@@ -78,10 +82,15 @@ public class Initialize implements ServletContextListener {
             logger.error("缓存master失败", e);
             throw new RuntimeException("缓存master失败");
         }
+
+        /**获取slave集群*/
         try {
             List<Slave> slaveList = BaseConfig.redisConnection.getList("slaves", Slave.class);
-            if(slaveList != null){
-                SlaveMess.slaves = slaveList;
+            for(Slave slave : slaveList){
+                ResponseModel responseModel = MonitorService.isAlive(slave);
+                if(responseModel != null){
+                    SlaveMess.addSlave(slave);
+                }
             }
         } catch (Exception e) {
         }

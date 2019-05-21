@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import javax.servlet.ServletOutputStream;
 import java.io.*;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +28,7 @@ import java.util.Map;
 @Service
 public class BackupServiceImpl implements BackupService {
 
-    private Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
+    private Logger logger = LoggerFactory.getLogger(BackupServiceImpl.class);
 
     @Autowired
     private RedisCache redisCache;
@@ -91,16 +93,38 @@ public class BackupServiceImpl implements BackupService {
         try {
             slaveList = redisCache.getListCache("slaves", Slave.class);
         } catch (Exception e) {
-            e.printStackTrace();
+
         }
+        Iterator<Map.Entry<String, String>> iterator = fileMess.entrySet().iterator();
+        Map<String, String> temp = new HashMap<>();
+        int count = 1;
+        while (iterator.hasNext()) {
+            Map.Entry<String, String> entry = iterator.next();
+            if(count%30 == 0){
+                for(Slave slave : slaveList){
+                    if(!slave.getIPHash6().equals(BaseConfig.IPHASH6)) {
+                        logger.info("invoke--------------------backupservice/aync? " + count + "---" + last + "--->" + now + ":" + slave.getBaseUrl());
+                        String baseurl = slave.getBaseUrl();
+                        String urlstr = baseurl + "/backup/put";
+                        HttpUtil.sendPostImage(urlstr, null, temp, null);
+                        logger.info("success--------------------backupservice/aync?" + count + "---" + last + "--->" + now + ":" + slave.getBaseUrl());
+                    }
+                }
+                temp = new HashMap<>();
+                temp.put(entry.getKey(), entry.getValue());
+            }else{
+                temp.put(entry.getKey(), entry.getValue());
+            }
+            count++;
+        }
+
         for(Slave slave : slaveList){
             if(!slave.getIPHash6().equals(BaseConfig.IPHASH6)) {
-                logger.info("invoke--------------------backupservice/aync?" + last + "--->" + now + slave.getBaseUrl());
+                logger.info("invoke--------------------backupservice/aync? " + count + "---" + last + "--->" + now + ":" + slave.getBaseUrl());
                 String baseurl = slave.getBaseUrl();
                 String urlstr = baseurl + "/backup/put";
-                HttpUtil.sendPostImage(urlstr, null, fileMess, null);
-                logger.info("success--------------------backupservice/aync?" + last + "--->" + now + slave.getBaseUrl());
-
+                HttpUtil.sendPostImage(urlstr, null, temp, null);
+                logger.info("success--------------------backupservice/aync?" + count + "---" + last + "--->" + now + ":" + slave.getBaseUrl());
             }
         }
     }

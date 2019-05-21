@@ -27,7 +27,7 @@ public class Initialize implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent arg0) {
-        // RedisCache redisCache = new RedisCache();
+
     }
 
     @Override
@@ -71,6 +71,7 @@ public class Initialize implements ServletContextListener {
         BaseConfig.MONITOR = monitor;
 
         BaseConfig.RECENT_SYNCH = new Date().getTime();
+        BaseConfig.RECENT_TIME = new Date().getTime();
 
         try {
             List<Key> keyList = RSAUtil.genKeyPair();
@@ -92,45 +93,41 @@ public class Initialize implements ServletContextListener {
         } catch (Exception e) {
 
         }
-        if(master == null){
-            throw new RuntimeException("连接不了主服务器");
-        }
-        BaseConfig.MASTER_IP = master.getIP();
-        BaseConfig.MASTER_PUBLICKEY = master.getPUBLICKEY();
-        BaseConfig.MASTER_URL = master.getBASEURL();
-        BaseConfig.MASTER_IPHASH6 = master.getIPHASH6();
+        if(master != null) {
+            BaseConfig.MASTER_IP = master.getIP();
+            BaseConfig.MASTER_PUBLICKEY = master.getPUBLICKEY();
+            BaseConfig.MASTER_URL = master.getBASEURL();
+            BaseConfig.MASTER_IPHASH6 = master.getIPHASH6();
 
-        String flag = null;
-        try {
-            String iphash6m1 = RSAUtil.encrypt(BaseConfig.IPHASH6, BaseConfig.PRIVATE_KEY);
-            flag = RSAUtil.encrypt(iphash6m1, BaseConfig.MASTER_PUBLICKEY);
-        } catch (Exception e) {
-            logger.error("生成register的flag时失败", e);
-            throw new RuntimeException("生成register的flag时失败");
-        }
+            String flag = null;
+            try {
+                String iphash6m1 = RSAUtil.encrypt(BaseConfig.IPHASH6, BaseConfig.PRIVATE_KEY);
+                flag = RSAUtil.encrypt(iphash6m1, BaseConfig.MASTER_PUBLICKEY);
+            } catch (Exception e) {
+                logger.error("生成register的flag时失败", e);
+            }
 
-        String registurl = BaseConfig.MASTER_URL + "/slave/regist";
-        String param = null;
-        try {
-            param = "flag=" + URLEncoder.encode(flag,"utf8") + "&pubKeyStr=" + URLEncoder.encode(RSAUtil.getString(BaseConfig.PUBLIC_KEY),"utf8") + "&baseUrl=" + URLEncoder.encode(BaseConfig.LOCAL_URL,"utf8");
-        } catch (UnsupportedEncodingException e) {
-            logger.error("转码失败",e);
-            throw new RuntimeException("转码失败");
-        }
+            String registurl = BaseConfig.MASTER_URL + "/slave/regist";
+            String param = null;
+            try {
+                param = "flag=" + URLEncoder.encode(flag, "utf8") + "&pubKeyStr=" + URLEncoder.encode(RSAUtil.getString(BaseConfig.PUBLIC_KEY), "utf8") + "&baseUrl=" + URLEncoder.encode(BaseConfig.LOCAL_URL, "utf8");
+            } catch (UnsupportedEncodingException e) {
+                logger.error("注册时转码失败", e);
+            }
 
-        ResponseModel responseModel = null;
-        try {
-            responseModel = HttpUtil.sendPostModel(registurl, param);
-        } catch (IOException e) {
-            logger.error("向主服务器注册失败", e);
-            throw new RuntimeException("向主服务器注册失败,master异常" + master.getBASEURL() + master.getIP());
+            ResponseModel responseModel = null;
+            try {
+                responseModel = HttpUtil.sendPostModel(registurl, param);
+                if (responseModel.getCode() == ResponseEnum.OK) {
+                    BaseConfig.RECENT_TIME = new Date().getTime();
+                    logger.info("注册成功: ", master.getIP());
+                }
+            } catch (IOException e) {
+                logger.error("向主服务器注册失败", e);
+            }
+        }else{
+            logger.info("系统没有master");
         }
-        if(responseModel.getCode() != ResponseEnum.OK){
-
-            throw new RuntimeException("向主服务器注册失败，slave异常");
-        }
-        logger.info("注册成功");
-
     }
 
 }

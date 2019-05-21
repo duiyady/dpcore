@@ -3,6 +3,7 @@ package com.duiya.model;
 import java.io.Serializable;
 
 public class ResponseModel implements Serializable {
+    private static final long serialVersionUID = 1297296862435171401L;
     private int code;
 
     private String msg;

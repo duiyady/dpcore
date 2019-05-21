@@ -49,6 +49,11 @@ public class BaseConfig {
     public static boolean VERIFIED;
 
     /**
+     * 最近一次和master注册或检测的时间
+     */
+    public static long RECENT_TIME;
+
+    /**
      * 请求接口是否需要监控时间
      */
     public static boolean MONITOR;

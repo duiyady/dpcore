@@ -11,6 +11,8 @@
     <module>base</module>
       <module>dpcore_slave</module>
     <module>dpcore_master</module>
+      <module>dpcore_single</module>
+      <module>dpcore_test</module>
   </modules>
   <packaging>pom</packaging>
 

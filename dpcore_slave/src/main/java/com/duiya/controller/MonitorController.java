@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
+
 @Controller
 @RequestMapping("monitor")
 public class MonitorController {
@@ -28,8 +30,9 @@ public class MonitorController {
     @RequestMapping(value = "alive", method = RequestMethod.GET)
     @ResponseBody
     @CrossOrigin//跨域
-    public JSONObject keepAlive(){
-        logger.info("invoke--------------------monitor/isalive");
+    public JSONObject alive(){
+        logger.info("invoke--------------------monitor/alive");
+        BaseConfig.RECENT_TIME = new Date().getTime();
         return ResponseUtil.constructOKResponse("success", null);
     }
 
@@ -58,6 +61,7 @@ public class MonitorController {
         if(s2.equals(BaseConfig.MASTER_IPHASH6)){
             backupService.aync(last, now);
         }
+        logger.info("invoke--------------------monitor/sync?last:" + last + ",now:" + now + "success");
         return ResponseUtil.constructOKResponse("success", null);
     }
 

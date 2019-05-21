@@ -1,7 +1,6 @@
 package com.duiya.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.duiya.cache.RedisCache;
 import com.duiya.init.BaseConfig;
 import com.duiya.init.SlaveMess;
 import com.duiya.model.Slave;
@@ -10,7 +9,6 @@ import com.duiya.utils.ResponseUtil;
 import com.duiya.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,9 +22,6 @@ import java.security.Key;
 public class SlaveController {
 
     private Logger logger = LoggerFactory.getLogger(SlaveController.class);
-
-    @Autowired
-    private RedisCache redisCache;
 
     /**
      * 注册slave
@@ -79,18 +74,5 @@ public class SlaveController {
         }else{
             return ResponseUtil.constructUnknownErrorResponse("添加失败");
         }
-    }
-
-
-    @RequestMapping("test")
-    @ResponseBody
-    public JSONObject test(@RequestParam(value = "flag", required = false)String flag,
-                           @RequestParam(value = "pubKeyStr", required = false)String pubKeyStr,
-                           @RequestParam(value = "baseUrl", required = false)String baseUrl){
-        System.out.println("flag: " + flag);
-        System.out.println("pubKeyStr: " + pubKeyStr);
-        System.out.println("baseUrl: " + baseUrl);
-
-        return ResponseUtil.constructOKResponse("success", "sf");
     }
 }

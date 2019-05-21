@@ -168,7 +168,7 @@ public class FileController {
         try {
             String flag = keyService.getUploadFlag(account, pass);
             if(flag == null){
-                return ResponseUtil.constructArgErrorResponse("c参数错误");
+                return ResponseUtil.constructArgErrorResponse("参数错误");
             }else{
                 return ResponseUtil.constructOKResponse("success", flag);
             }

@@ -106,8 +106,6 @@ public class SlaveMess {
             }
             slave = slaves.get(index);
             if(!(slave.getState() == 1)){
-                System.out.println(slave.getState());
-                System.out.println("error");
                 slave = null;
             }
             index++;

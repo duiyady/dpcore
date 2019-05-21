@@ -35,7 +35,6 @@ public class MonitorInterceptor extends HandlerInterceptorAdapter {
             long endTime = System.currentTimeMillis();
             //这里的选择写入日志还是动态分析
             logger.info("requesr:" + request.getRequestURI()+ "--->" + new Long(endTime - startTime) + "ms");
-            System.out.println(request.getRequestURI() + " -->" + new Long(endTime - startTime)+"ms");
         }
     }
 
