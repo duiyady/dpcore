@@ -2,7 +2,7 @@
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
 	<property name="CONTEXT_NAME" value="dpcoreslave" />
 	<contextName>${CONTEXT_NAME}</contextName>
-	<property name="LOG_PATH" value="/Users/duiya/tmp/weblogs/dpcoreslaveLog" />
+	<property name="LOG_PATH" value="/Users/duiya/tmp/weblogs/dpcoreslaveLog2" />
 	<if condition='property("os.name").toUpperCase().contains("WINDOWS")'>
 		<then>
 			<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">

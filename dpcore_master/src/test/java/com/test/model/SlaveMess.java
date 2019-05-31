@@ -1,15 +1,11 @@
 package com.test.model;
 
-import com.duiya.model.Escala;
 import com.duiya.model.Slave;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
 public class SlaveMess {
-
     public static List<Slave> slaves = new ArrayList<>();
 
     /**
@@ -17,10 +13,6 @@ public class SlaveMess {
      */
     private static int index = 0;
 
-    /**
-     * 权重时用这个
-     */
-    private static List<Escala> slaveEs = new ArrayList<>();
 
     /**
      * 是否有这个slave
@@ -37,20 +29,44 @@ public class SlaveMess {
     }
 
     /**
+     * 通过iphash6判断是否有此slave
+     * @param iphash6
+     * @return
+     */
+    public static boolean hasSlaveByIp(String iphash6){
+        for(int i = 0; i < slaves.size(); i++){
+            if(slaves.get(i).getIPHash6().equals(iphash6)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * 添加slave
      * @param slave
      */
     public static void addSlave(Slave slave){
         Slave temp = getSlave(slave.getBaseUrl());
         if(temp == null){
-            slaves.add(slave);
+            if(slaves.size() != 0){
+                slave.setNowquanz(slaves.get(0).getNowquanz());
+            }
+            slaves.add(0, slave);
         }else{
             temp.setState(1);
             temp.setBaseUrl(slave.getBaseUrl());
             temp.setPublicKey(slave.getPublicKey());
             temp.setIPHash6(slave.getIPHash6());
+            if(slaves.size() != 0){
+                slave.setNowquanz(slaves.get(0).getNowquanz());
+            }
+            changeList();
         }
-        //redisCache.putPerpetualListCache("slaves", SlaveMess.slaves);
+        try {
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -69,6 +85,43 @@ public class SlaveMess {
         return slave;
     }
 
+    /**
+     * 通过iphash6获取slave
+     * @param iphash6
+     * @return
+     */
+    public static Slave getSlaveByIP(String iphash6){
+        Slave slave = null;
+        for(int i = 0; i < slaves.size(); i++){
+            if(slaves.get(i).getIPHash6().equals(iphash6)){
+                slave = slaves.get(i);
+                break;
+            }
+        }
+        return slave;
+    }
+
+    /**
+     * 使用权重负载均衡时，slave更新后修改状态
+     */
+    public static synchronized void createList(){
+        int i = 0;
+        for(int k = 0; k < slaves.size(); i++){
+            if(slaves.get(k).getState() == 2){
+                if(i == k){
+
+                }else{
+                    Slave slave1 = slaves.get(k);
+                    Slave slave2 = slaves.get(i);
+                    slaves.set(k, slave2);
+                    slaves.set(i, slave1);
+                }
+                i++;
+            }
+        }
+    }
+
+
 
     /**
      * 删除slave
@@ -86,30 +139,65 @@ public class SlaveMess {
         if(flag != -1){
             slaves.remove(flag);
         }
-        //redisCache.putPerpetualListCache("slaves", SlaveMess.slaves);
+        try {
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 权重时修改链表
+     */
+    private static synchronized void changeList(){
+        int count = slaves.size();
+        for(int i = count-1; i > 0; i--){
+            System.out.println(i);
+            for(int j = 0; j < i; j++){
+                System.out.println(j);
+                if((slaves.get(j).getState() == 1 && slaves.get(j+1).getState() != 1)
+                        || (slaves.get(j+1).getNowquanz() < slaves.get(j).getNowquanz() && slaves.get(j+1).getState() ==1 && slaves.get(j).getState() == 1)){
+                    Slave slave = slaves.get(j+1);
+                    slaves.set(j+1, slaves.get(j));
+                    slaves.set(j, slave);
+                }
+            }
+        }
+    }
+
+    /**
+     * 初始化链表状态
+     */
+    public static void initList(){
+        int count = slaves.size();
+        for(int i = 0; i < count; i++){
+            slaves.get(i).setNowquanz(0);
+        }
+        changeList();
     }
 
     public static synchronized String getFunctionSlave(){
-        Slave slave = null;
-        int count = slaves.size();
-        for(Slave slave1 : slaves){
-            System.out.println(slave1.toString());
-        }
-        while(slave == null && count > 0){
-            if(index >= slaves.size()){
-                index = 0;
+
+            if(slaves.size() == 0){
+                return null;
             }
-            slave = slaves.get(index);
-            if(!(slave.getState() == 1)){
-                slave = null;
+            int count = slaves.size();
+            Slave slave = null;
+            for(int i = 0; i < count; i++){
+                slave = slaves.get(i);
+                if(slave.getState() != 1){
+                    slave = null;
+                }else{
+                    slave.addNowqz();
+
+                    changeList();
+
+                    break;
+                }
             }
-            index++;
-            count--;
-        }
-        if(slave != null){
-            return slave.getBaseUrl();
-        }else{
-            return null;
-        }
+            if(slave == null){
+                return null;
+            }else{
+                return slave.getBaseUrl();
+            }
     }
 }

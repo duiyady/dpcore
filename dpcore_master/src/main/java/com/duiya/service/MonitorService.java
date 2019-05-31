@@ -25,6 +25,20 @@ public class MonitorService {
         return responseModel;
     }
 
+    public static ResponseModel upAlive(Slave slave) {
+        String url = slave.getBaseUrl() + "/monitor/updateState";
+        ResponseModel responseModel = null;
+        try {
+            responseModel = HttpUtil.sendGetModel(url, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error("心跳检测时http失败", e);
+        }
+        return responseModel;
+    }
+
+
+
     public static ResponseModel requestASYN(Slave slave, String baseparam, String s1) {
         String url = slave.getBaseUrl() + "/monitor/sync";
         String s2 = RSAUtil.encrypt(s1, slave.getPublicKey());

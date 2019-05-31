@@ -31,10 +31,11 @@ public class TimeFunction {
      * 每隔90秒检测最近同步
      * 通过@Scheduled声明该方法是计划任务，使用fixedRate属性每隔固定时间执行。
      */
-    @Scheduled(fixedRate = 1000 * 90)
+    @Scheduled(fixedRate = 1000 * 45)
     public void isAlive() {
+        logger.info("检测是否和master存在联系");
         long now  = new Date().getTime();
-        if((now - BaseConfig.RECENT_TIME) > 1000*90){
+        if((now - BaseConfig.RECENT_TIME) > 1000*45){
             ServerCache master = null;
             try {
                 master = redisCache.getCache("master", ServerCache.class);
@@ -71,10 +72,10 @@ public class TimeFunction {
                         logger.info("注册成功: ", master.getIP());
                     }
                 } catch (IOException e) {
-                    logger.error("向主服务器注册失败", e);
+                    //logger.error("向主服务器注册失败", e);
                 }
             }else{
-                logger.info("系统没有mster");
+                logger.info("系统没有master");
             }
         }
     }

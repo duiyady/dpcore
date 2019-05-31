@@ -15,8 +15,31 @@ public class Slave implements Serializable {
 
     private int state;//1可用 2一次检测不到 3两次检测不到 4三次检测不到(移除) 10设置的不可用
 
+    private int basize;//权重
+
+    //max  9223372036854775807
+    private long nowquanz;//现在的权重
+
+    public int getBasize() {
+        return basize;
+    }
+
+    public long getNowquanz() {
+        return nowquanz;
+    }
+
+    public void setNowquanz(long nowquanz) {
+        this.nowquanz = nowquanz;
+    }
+
+    public void setBasize(int basize) {
+        this.basize = basize;
+    }
+
     public Slave() {
         this.state = 1;
+        this.basize = 3;
+        this.nowquanz = 0;
     }
 
     public int getState() {
@@ -58,5 +81,9 @@ public class Slave implements Serializable {
 
     public void setPublicKey(Key publicKey) {
         this.publicKey = publicKey;
+    }
+
+    public void addNowqz(){
+        this.nowquanz += basize;
     }
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.duiya.dao.UserDao">
+    <select id="hasAccount" parameterType="string" resultType="int">
+        select count(*) from t_user where user_account=#{account}
+    </select>
+
+    <insert id="regist" parameterType="String">
+         insert into t_user(user_account, user_password, user_sskey, user_email) values (#{account},#{password},#{publicKey},#{email})
+    </insert>
+
+    <select id="login" parameterType="string" resultType="map">
+        select user_sskey as publicKey,user_state as userState from t_user where user_account=#{account} and user_password=#{password}
+    </select>
+</mapper>

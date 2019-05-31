@@ -24,7 +24,7 @@ public class TimeFunction {
     /**
      * 每个30分钟同步数据
      */
-    @Scheduled(fixedRate = 1000 * 60 * 1) //通过@Scheduled声明该方法是计划任务，使用fixedRate属性每隔固定时间执行。
+    @Scheduled(fixedRate = 1000 * 60 * 10) //通过@Scheduled声明该方法是计划任务，使用fixedRate属性每隔固定时间执行。
     public void requestASYN() {
         Long now = new Date().getTime();
         BaseConfig.ASYNtime1 = BaseConfig.ASYNtime2;
@@ -49,7 +49,7 @@ public class TimeFunction {
     /**
      * 每隔30秒发送一次心跳
      */
-    @Scheduled(fixedRate = 1000 * 30) //通过@Scheduled声明该方法是计划任务，使用fixedRate属性每隔固定时间执行。
+    @Scheduled(fixedRate = 1000 * 10) //通过@Scheduled声明该方法是计划任务，使用fixedRate属性每隔固定时间执行。
     public void isAlive() {
         logger.info("-----------------开始心跳检测----------------");
         List<String> del = new LinkedList<>();
@@ -61,13 +61,16 @@ public class TimeFunction {
                     slave.setState(2);
                 }else{
                     slave.setState(slave.getState()+1);
-                    if(slave.getState() == 3){
+                    if(slave.getState() == 4){
                         del.add(baseUrl);
                     }
                 }
+                logger.info(baseUrl + "未响应...........");
             }else{
                 logger.info(baseUrl + "存活...........");
-                SlaveMess.getSlave(baseUrl).setState(1);
+                if(slave.getState() != 10) {
+                    slave.setState(1);
+                }
             }
         }
         for(String s : del){

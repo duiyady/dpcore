@@ -85,10 +85,12 @@ public class Initialize implements ServletContextListener {
 
         /**获取slave集群*/
         try {
+            logger.info("======master初始化恢复集群slave端信息======");
             List<Slave> slaveList = BaseConfig.redisConnection.getList("slaves", Slave.class);
             for(Slave slave : slaveList){
-                ResponseModel responseModel = MonitorService.isAlive(slave);
+                ResponseModel responseModel = MonitorService.upAlive(slave);
                 if(responseModel != null){
+                    logger.info("======" + slave.getBaseUrl() + "加入集群");
                     SlaveMess.addSlave(slave);
                 }
             }

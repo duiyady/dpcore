@@ -1,0 +1,6 @@
+#fileshow li{
+	width: 234px;
+	height: 250px;
+	list-style: none;
+	float: left
+}

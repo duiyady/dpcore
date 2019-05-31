@@ -55,7 +55,7 @@ public class FileController {
                                  @RequestParam(value = "flag", required = false) String flag) {
 
 
-        logger.info("invokeinvoke--------------------file/upload?account:" + account + ",flag:" + flag);
+        logger.info("invoke--------------------file/upload?account:" + account + ",flag:" + flag);
 
         /*是否需要验证*/
         if (BaseConfig.VERIFIED) {
@@ -161,7 +161,7 @@ public class FileController {
      * @param pass
      * @return
      */
-    @RequestMapping(value = "getFlag", method = RequestMethod.POST)
+    @RequestMapping(value = "getFlag", method = RequestMethod.GET)
     @ResponseBody
     public JSONObject getFlag(@RequestParam("account")String account, @RequestParam("pass")String pass){
         logger.info("invoke--------------------file/getFlag?account:" + account);
@@ -174,6 +174,7 @@ public class FileController {
             }
         } catch (Exception e) {
             logger.error("获取上传图片的flag失败", e);
+            e.printStackTrace();
             return ResponseUtil.constructUnknownErrorResponse("unknown error");
         }
     }

@@ -133,6 +133,8 @@ public class BackupController {
     @CrossOrigin//跨域
     public JSONObject filePut(@RequestParam("file") MultipartFile[] multipartFiles,
                               HttpServletRequest request) {
+
+        logger.info("invoke--------------------backup/put");
         String ip = request.getHeader("x-forwarded-for");
         if (ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown"))
             ip = request.getHeader("Proxy-Client-IP");
@@ -142,7 +144,6 @@ public class BackupController {
             ip = request.getRemoteAddr();
         //if (slaveService.hasIp(ip)) {
             // 判断文件是否为空
-        System.out.println("进来了");
             if (multipartFiles != null && multipartFiles.length >= 1) {
                 try {
                     fileService.saveFile(multipartFiles);

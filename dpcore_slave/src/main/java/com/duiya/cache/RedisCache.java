@@ -36,7 +36,8 @@ public class RedisCache {
 		final byte[] bvalue = ProtoStuffSerializerUtil.serialize(obj);
 		boolean result = redisTemplate.execute(new RedisCallback<Boolean>() {
 			public Boolean doInRedis(RedisConnection connection) throws DataAccessException {
-				return connection.setNX(bkey, bvalue);
+				connection.setEx(bkey, CAHCETIME, bvalue);
+				return true;
 			}
 		});
 		return result;

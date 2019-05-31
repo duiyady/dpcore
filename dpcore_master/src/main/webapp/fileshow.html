@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<!-- saved from url=(0022)http://localhost:9084/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style type="text/css">@charset "UTF-8";[ng\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide{display:none !important;}ng\:form{display:block;}</style>
+		
+		<!--<meta charset="gbk" />-->
+		<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+		<title>用户文件</title>
+
+		<link rel="stylesheet" type="text/css" href="css/webbase.css">
+		<link rel="stylesheet" type="text/css" href="css/pages-list.css">
+    </head>
+
+	<body ng-app="kk" ng-controller="searchController" ng-init="loadkeywords()" class="ng-scope">
+		
+
+	
+	<!--list-content-->
+	<div class="main">
+		<div class="py-container">
+			<!--details-->
+			<div class="details">
+				<div class="sui-navbar">
+					<div class="navbar-inner filter">
+						<ul class="sui-nav">
+                            <li class="active">
+                                <a>我的图片</a>
+                            </li>
+							<li>
+								<a></a>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="goods-list">
+					<ul class="yui3-g">
+						<li class="yui3-u-1-5 ng-scope" ng-repeat="item in resultMap.rows">
+							<div class="list-wrap">
+								<div class="p-img">
+									<a target="_blank"><img src="./img/001.jpg"></a>
+								</div>
+                                <div class="attr ng-binding"><center>-1602220190516540432425a2fee</center></div>
+								<div class="operate">
+									<center>
+										<a target="_blank" class="sui-btn btn-bordered btn-danger">删除</a>
+										<a class="sui-btn btn-bordered">查看</a>
+									</center>
+								</div>
+							</div>
+						</li>
+						<li class="yui3-u-1-5 ng-scope" ng-repeat="item in resultMap.rows">
+							<div class="list-wrap">
+								<div class="p-img">
+									<a target="_blank"><img src="./img/002.jpg"></a>
+								</div>
+                                <div class="attr ng-binding"><center>-210202019051657122595e1362d</center></div>
+								<div class="operate">
+									<center>
+										<a target="_blank" class="sui-btn btn-bordered btn-danger">删除</a>
+										<a class="sui-btn btn-bordered">查看</a>
+									</center>
+								</div>
+							</div>
+						</li>
+						<li class="yui3-u-1-5 ng-scope" ng-repeat="item in resultMap.rows">
+							<div class="list-wrap">
+								<div class="p-img">
+									<a target="_blank">
+										<center><img class="duiyapic" src="./img/017.jpg"></center>
+									</a>
+								</div>
+                                <div class="attr ng-binding"><center>-16022201905165504467a2d06c9</center></div>
+								<div class="operate">
+									<center>
+										<a target="_blank" class="sui-btn btn-bordered btn-danger">删除</a>
+										<a class="sui-btn btn-bordered">查看</a>
+									</center>
+								</div>
+							</div>
+						</li>
+						<li class="yui3-u-1-5 ng-scope" ng-repeat="item in resultMap.rows">
+							<div class="list-wrap">
+								<div class="p-img">
+									<a target="_blank"><img src="./img/007.jpg"></a>
+								</div>
+                                <div class="attr ng-binding"><center>-21020201905165712285756b50d</center></div>
+								<div class="operate">
+									<center>
+										<a target="_blank" class="sui-btn btn-bordered btn-danger">删除</a>
+										<a class="sui-btn btn-bordered">查看</a>
+									</center>
+								</div>
+							</div>
+						</li>
+						<li class="yui3-u-1-5 ng-scope" ng-repeat="item in resultMap.rows">
+							<div class="list-wrap">
+								<div class="p-img">
+									<a target="_blank"><img src="./img/012.jpg"></a>
+								</div>
+                                <div class="attr ng-binding"><center>-1602220190516570453549dc00b</center></div>
+								<div class="operate">
+									<center>
+										<a target="_blank" class="sui-btn btn-bordered btn-danger">删除</a>
+										<a class="sui-btn btn-bordered">查看</a>
+									</center>
+								</div>
+							</div>
+						</li>
+						<li class="yui3-u-1-5 ng-scope" ng-repeat="item in resultMap.rows">
+							<div class="list-wrap">
+								<div class="p-img">
+									<a target="_blank"><img src="./img/011.jpg"></a>
+								</div>
+                                <div class="attr ng-binding"><center>-2102020190516561230954eee4c</center></div>
+								<div class="operate">
+									<center>
+										<a target="_blank" class="sui-btn btn-bordered btn-danger">删除</a>
+										<a class="sui-btn btn-bordered">查看</a>
+									</center>
+								</div>
+							</div>
+						</li>
+						<li class="yui3-u-1-5 ng-scope" ng-repeat="item in resultMap.rows">
+							<div class="list-wrap">
+								<div class="p-img">
+									<a target="_blank"><img src="./img/016.jpg"></a>
+								</div>
+                                <div class="attr ng-binding"><center>-1602220190516570426b5582c93</center></div>
+								<div class="operate">
+									<center>
+										<a target="_blank" class="sui-btn btn-bordered btn-danger">删除</a>
+										<a class="sui-btn btn-bordered">查看</a>
+									</center>
+								</div>
+							</div>
+						</li>
+						<li class="yui3-u-1-5 ng-scope" ng-repeat="item in resultMap.rows">
+							<div class="list-wrap">
+								<div class="p-img">
+									<a target="_blank"><img src="./img/011.jpg"></a>
+								</div>
+                                <div class="attr ng-binding"><center>-2102020190516551229f8bc18a6</center></div>
+								<div class="operate">
+									<center>
+										<a target="_blank" class="sui-btn btn-bordered btn-danger">删除</a>
+										<a class="sui-btn btn-bordered">查看</a>
+									</center>
+								</div>
+							</div>
+						</li>
+						<li class="yui3-u-1-5 ng-scope" ng-repeat="item in resultMap.rows">
+							<div class="list-wrap">
+								<div class="p-img">
+									<a target="_blank"><img src="./img/022.jpg"></a>
+								</div>
+                                <div class="attr ng-binding"><center>-21020201905165712285756b50d</center></div>
+								<div class="operate">
+									<center>
+										<a target="_blank" class="sui-btn btn-bordered btn-danger">删除</a>
+										<a class="sui-btn btn-bordered">查看</a>
+									</center>
+								</div>
+							</div>
+						</li>
+						<li class="yui3-u-1-5 ng-scope" ng-repeat="item in resultMap.rows">
+							<div class="list-wrap">
+								<div class="p-img">
+									<a target="_blank"><img src="./img/021.jpg"></a>
+								</div>
+                                <div class="attr ng-binding"><center>-1602220190516580441e6ec19e5</center></div>
+								<div class="operate">
+									<center>
+										<a target="_blank" class="sui-btn btn-bordered btn-danger">删除</a>
+										<a class="sui-btn btn-bordered">查看</a>
+									</center>
+								</div>
+							</div>
+						</li>
+
+					</ul>
+				</div>
+				<div class="fr page">
+					<div class="sui-pagination pagination-large">
+						<ul>
+							<li class="prev ">
+								<a>«</a>
+							</li>
+                            <li class="" ng-repeat="p in pageLabel">
+								<a class="ng-binding">1</a>
+							</li>
+							<li class="" ng-repeat="p in pageLabel">
+								<a class="ng-binding">2</a>
+							</li>
+							<li class="" ng-repeat="p in pageLabel">
+								<a class="ng-binding">3</a>
+							</li>
+							<li class="" ng-repeat="p in pageLabel">
+								<a class="ng-binding">4</a>
+							</li>
+
+							<li>
+								<a ng-click="queryByPage(searchMap.pageNo+1)">»</a>
+							</li>
+						</ul>
+						<div>
+							<span>共4页&nbsp;</span>
+							<span>
+								到第
+								<input type="text" class="page-num">
+								页
+								<button class="page-confirm">确定</button>
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+
+</body>
+</html>

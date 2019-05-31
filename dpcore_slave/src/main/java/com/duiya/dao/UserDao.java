@@ -1,9 +1,10 @@
 package com.duiya.dao;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UserDao {
-    String getUserKey(String account, String pass);
+    String getUserKey(@Param("account") String account, @Param("pass") String pass);
 
 }

@@ -3,6 +3,7 @@ package com.duiya.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.duiya.cache.RedisCache;
 import com.duiya.init.BaseConfig;
+import com.duiya.model.ServerCache;
 import com.duiya.service.BackupService;
 import com.duiya.utils.RSAUtil;
 import com.duiya.utils.ResponseUtil;
@@ -34,6 +35,30 @@ public class MonitorController {
         logger.info("invoke--------------------monitor/alive");
         BaseConfig.RECENT_TIME = new Date().getTime();
         return ResponseUtil.constructOKResponse("success", null);
+    }
+
+    //控制端检测服务器是否正常
+    @RequestMapping(value = "updateState", method = RequestMethod.GET)
+    @ResponseBody
+    @CrossOrigin//跨域
+    public JSONObject updateMaster(){
+        logger.info("invoke--------------------monitor/updateState");
+        ServerCache master = null;
+        try {
+            master = redisCache.getCache("master", ServerCache.class);
+        }catch (Exception e){
+            return ResponseUtil.constructUnknownErrorResponse(null);
+        }
+        if(master != null){
+            BaseConfig.MASTER_IPHASH6 = master.getIPHASH6();
+            BaseConfig.MASTER_IP = master.getIP();
+            BaseConfig.MASTER_URL = master.getBASEURL();
+            BaseConfig.MASTER_PUBLICKEY = master.getPUBLICKEY();
+            BaseConfig.RECENT_TIME = new Date().getTime();
+            return ResponseUtil.constructOKResponse("success", null);
+        }else{
+            return ResponseUtil.constructUnknownErrorResponse(null);
+        }
     }
 
     /**

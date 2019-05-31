@@ -1,0 +1,145 @@
+.main {
+	margin: 10px 0
+}
+
+.type-wrap {
+	overflow: hidden
+}
+
+.details {
+	margin: 0
+}
+
+.filter {
+	border: 1px solid #ddd
+}
+
+.sui-btn {
+	border-radius: 0
+}
+
+
+.filter {
+	background: #F1F1F1
+}
+
+.sui-navbar {
+	margin-bottom: 0
+}
+
+.sui-navbar .navbar-inner {
+	padding-left: 0;
+	border-radius: 0
+}
+
+.sui-navbar .sui-nav>.active>a {
+	background: #FF8D33;
+	color: #fff
+}
+
+.goods-list {
+	margin: 20px 0
+}
+
+.goods-list ul li {
+	margin-top: 10px;
+	line-height: 28px
+}
+
+.goods-list ul li:hover {
+	box-shadow: 0 0 10px 2px #ededed
+}
+
+.goods-list .p-img {
+	height: 200px
+}
+
+.duiyapic{
+	height: 200px;
+}
+
+.p-img,
+.attr,
+.operate {
+	padding-left: 15px
+}
+
+.attr {
+	height: 10px;
+}
+
+
+.operate {
+	padding: 12px 15px
+}
+
+
+.page {
+	width: 733px;
+	height: 66px;
+	overflow: hidden
+}
+
+.sui-pagination div {
+	float: right;
+	width: 241px
+}
+
+.sui-pagination ul {
+	display: inline-block;
+	*display: inline;
+	*zoom: 1;
+	width: 490px;
+	float: left
+}
+
+.sui-pagination ul>.>a {
+	background-color: #fff;
+	color: #c81623;
+	border-color: #fff;
+	cursor: default
+}
+
+.sui-pagination ul>.active>a:hover {
+	background: #ccc;
+	border: 1px solid #ddd
+}
+
+.sui-pagination ul>li {
+	display: inline-block;
+	*display: inline;
+	*zoom: 1
+}
+
+.pagination-large ul>li>a,
+.pagination-large ul>li>span {
+	padding: 9px 18px;
+	color: #333
+}
+
+.sui-pagination ul>li>a:hover {
+	background: #ccc;
+	border: 1px solid #ddd
+}
+
+.sui-pagination ul>.dotted>span,
+.sui-pagination ul>.dotted>a {
+	border: 0
+}
+
+.pagination-large div .page-num {
+	padding: 9px 12px
+}
+
+.pagination-large div .page-num+.page-confirm {
+	padding: 5px 8px;
+	color: #666;
+	background-color: #FF8D33;
+	border: 1px solid #ddd
+}
+
+.sui-pagination div {
+	display: inline-block;
+	*display: inline;
+	*zoom: 1
+}

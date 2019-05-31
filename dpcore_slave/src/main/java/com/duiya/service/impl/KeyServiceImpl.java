@@ -3,6 +3,7 @@ package com.duiya.service.impl;
 import com.duiya.cache.RedisCache;
 import com.duiya.dao.UserDao;
 import com.duiya.service.KeyService;
+import com.duiya.utils.MD5Util;
 import com.duiya.utils.RSAUtil;
 import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,8 @@ public class KeyServiceImpl implements KeyService {
 
     @Override
     public String getUploadFlag(String account, String pass) throws Base64DecodingException, NoSuchAlgorithmException, InvalidKeySpecException {
-        String keyS = userDao.getUserKey(account, pass);
+        String passw = MD5Util.generateCheckString(pass);
+        String keyS = userDao.getUserKey(account, passw);
         if(keyS == null){
             return null;
         }else{
@@ -55,7 +57,7 @@ public class KeyServiceImpl implements KeyService {
             Key key = RSAUtil.getPublicKey(keyS);
             String miwen = RSAUtil.encrypt(uuid, key);
             try {
-                redisCache.putCache("upf" + account, String.class);
+                redisCache.putCache("upf" + account, uuid);
             } catch (Exception e) {
                 e.printStackTrace();
             }
