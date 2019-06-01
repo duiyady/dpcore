@@ -30,7 +30,6 @@ public class MonitorController {
     //控制端检测服务器是否正常
     @RequestMapping(value = "alive", method = RequestMethod.GET)
     @ResponseBody
-    @CrossOrigin//跨域
     public JSONObject alive(){
         logger.info("invoke--------------------monitor/alive");
         BaseConfig.RECENT_TIME = new Date().getTime();
@@ -40,7 +39,6 @@ public class MonitorController {
     //控制端检测服务器是否正常
     @RequestMapping(value = "updateState", method = RequestMethod.GET)
     @ResponseBody
-    @CrossOrigin//跨域
     public JSONObject updateMaster(){
         logger.info("invoke--------------------monitor/updateState");
         ServerCache master = null;
@@ -70,7 +68,6 @@ public class MonitorController {
      */
     @RequestMapping(value = "sync", method = RequestMethod.POST)
     @ResponseBody
-    @CrossOrigin//跨域
     public JSONObject sync(@RequestParam(value = "last") Long last,
                            @RequestParam(value = "now") Long now,
                            @RequestParam(value = "flag") String flag){

@@ -64,7 +64,6 @@ public class UserController {
                              @RequestParam(value = "password")String password,
                              HttpServletRequest request, HttpServletResponse response){
 
-        System.out.println(account + "   " + password);
         if(StringUtil.isBlank(account, password)){
             return ResponseUtil.constructArgErrorResponse("参数不能为空");
         }
@@ -85,12 +84,20 @@ public class UserController {
             StringBuffer url = request.getRequestURL();
             String str = url.substring(0, url.length()-10);
             //管理员
-            return ResponseUtil.constructOKResponse("success",str + "rootindex.html");
+            return ResponseUtil.constructOKResponse("success","rootindex.html");
         }else{
             //普通用户
             StringBuffer url = request.getRequestURL();
             String str = url.substring(0, url.length()-10);
-            return ResponseUtil.constructOKResponse("success",str + "fileshow.html");
+            return ResponseUtil.constructOKResponse("success","fileshow.html");
         }
+    }
+
+    @RequestMapping(value = "logout")
+    @ResponseBody
+    public JSONObject regist(@RequestParam(value = "account")String account,
+                             @RequestParam(value = "state")Integer state){
+        userService.logout(account,state);
+        return ResponseUtil.constructOKResponse("success", null);
     }
 }

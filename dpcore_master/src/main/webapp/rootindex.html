@@ -7,7 +7,8 @@
 
 	<link href="css/my.css" rel="stylesheet" type="text/css">
 
-	<script type="text/javascript" src="js/jquery-2.0.0.min.js"></script>
+	<script src="js/jquery-2.0.0.min.js"></script>
+    <script src="js/jquery.cookie.js"></script>
 	
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
 </head>
@@ -25,9 +26,6 @@
 									<li class="active">
 										<a href="#">集群信息</a>
 									</li>
-									<li>
-										<a href="#">文件信息</a>
-									</li>
 									<li class="dropdown">
 									 	<a data-toggle="dropdown" class="dropdown-toggle" href="#">均衡方式<strong class="caret"></strong></a>
 										<ul class="dropdown-menu">
@@ -42,7 +40,7 @@
 								</ul>
 								<ul class="nav pull-right">
 									<li>
-										<a href="#">退出</a>
+										<a onclick="logout()">退出</a>
 									</li>
 								
 								</ul>
@@ -82,25 +80,81 @@
 
 		});
 
+		function logout(){
+			var account=$.cookie('account');
+			$.ajax({
+				type : "POST",
+				url : "user/logout",
+				xhrFields: {
+					withCredentials: true
+				},
+				crossDomain: true,
+				data: {"account":account,"state":"1"},
+				dataType:"json",
+				success : function(result) {
+					$.cookie('account',null,{expires:-1,path: '/'})
+					window.location.href="index.html";
+				},
+				error: function(str) {
+					$.cookie('account',null,{expires:-1,path: '/'})
+					window.location.href="index.html";
+				}
+			});
+
+		}
+
 		function getBlance(){
 			var curWwwPath=window.location.href;
             var pathName=window.location.pathname;
             var pos=curWwwPath.indexOf(pathName);
             var baseurl=curWwwPath.substring(0,pos);
+            var account=$.cookie('account');
 			$.ajax({
 				type : "POST",
-				url : "http://localhost:10076/dpcore_master/slave/getblance",
+				url : "slave/getblance",
 				xhrFields: {
 					withCredentials: true
 				},
 				crossDomain: true,
-				data: {},
+				data: {"account":account},
 				dataType:"json",
 				success : function(result) {
 					var message = eval(result);
 					var code = message.code;
 					if(code == 0){
 						changeBlini(message.data);
+					}else if(code == -2){
+						$.cookie('account',null,{expires:-1,path: '/'});
+						window.location.href="index.html";
+					}else{
+						alert(message.msg);
+										}
+				},
+				error: function(str) {
+					alert("network error");
+				}
+			});
+		}
+
+		function changeBl(value){
+			var account=$.cookie('account');
+			$.ajax({
+				type : "POST",
+				url : "slave/changeblance",
+				xhrFields: {
+					withCredentials: true
+				},
+				crossDomain: true,
+				data: {"blance":value,"account":account},
+				dataType:"json",
+				success : function(result) {
+					var message = eval(result);
+					var code = message.code;
+					if(code == 0){
+						changeBlini(value);
+					}else if(code == -2){
+						$.cookie('account',null,{expires:-1,path: '/'});
+						window.location.href="index.html";
 					}else{
 						alert(message.msg);
 					}
@@ -111,46 +165,25 @@
 			});
 		}
 
-		function changeBl(value){
-			$.ajax({
-				type : "POST",
-				url : "http://localhost:10076/dpcore_master/slave/changeblance",
-				xhrFields: {
-					withCredentials: true
-				},
-				crossDomain: true,
-				data: {"blance":value},
-				dataType:"json",
-				success : function(result) {
-					var message = eval(result);
-					var code = message.code;
-					if(code == 0){
-						changeBlini(value);
-					}else if(code == -1){
-						alert(message.msg);
-					}
-				},
-				error: function(str) {
-					alert("network error");
-				}
-			});
-		}
-
 		function changesstate(iphash6, state) {
+			var account=$.cookie('account');
 			$.ajax({
 				type : "POST",
-				url : "http://localhost:10076/dpcore_master/slave/changeslavestate",
+				url : "slave/changeslavestate",
 				xhrFields: {
 					withCredentials: true
 				},
 				crossDomain: true,
-				data: {"iphash6":iphash6,"state":state},
+				data: {"iphash6":iphash6,"state":state,"account":account},
 				dataType:"json",
 				success : function(result) {
 					var message = eval(result);
 					var code = message.code;
 					if(code == 0){
 						getSlaves();
+					}else if(code == -2){
+						$.cookie('account',null,{expires:-1,path: '/'});
+						window.location.href="index.html";
 					}else{
 						alert(message.msg);
 					}
@@ -162,21 +195,25 @@
 		}
 
 		function changesquan(iphash6) {
+			var account=$.cookie('account');
 			var quan = $('#quan'+iphash6).val();
 			$.ajax({
 				type : "POST",
-				url : "http://localhost:10076/dpcore_master/slave/changeQuan",
+				url : "slave/changeQuan",
 				xhrFields: {
 					withCredentials: true
 				},
 				crossDomain: true,
-				data: {"iphash6":iphash6,"quan":quan},
+				data: {"iphash6":iphash6,"quan":quan,"account":account},
 				dataType:"json",
 				success : function(result) {
 					var message = eval(result);
 					var code = message.code;
 					if(code == 0){
 						getSlaves();
+					}else if(code == -2){
+						$.cookie('account',null,{expires:-1,path: '/'});
+						window.location.href="index.html";
 					}else{
 						alert(message.msg);
 					}
@@ -211,27 +248,30 @@
             var pathName=window.location.pathname;
             var pos=curWwwPath.indexOf(pathName);
             var baseurl=curWwwPath.substring(0,pos);
-           
+           var account=$.cookie('account');
 			$.ajax({
 				type : "POST",
-				url : "http://localhost:10076/dpcore_master/slave/getslaves",
+				url : "slave/getslaves",
 				xhrFields: {
 					withCredentials: true
 				},
 				crossDomain: true,
-				data: {},
+				data: {"account":account},
 				dataType:"json",
 				success : function(result) {
 					var message = eval(result);
 					var code = message.code;
 					if(code == 0){
 						initslave(message.data)
-					}else if(code == -1){
+					}else if(code == -2){
+						$.cookie('account',null,{expires:-1,path: '/'});
 						window.location.href = "index.html";
+					}else{
+						alert(message.msg);
 					}
 				},
 				error: function(str) {
-					window.location.href = "index.html";
+					alert("network error");
 				}
 			});
 		}
@@ -265,10 +305,10 @@
 				var state;
 				var trTag;
 				if(data[i].state != 10){
-					trTag = $('<tr class="' + a[5] + '"></tr>');
+					trTag = $('<tr class="' + a[data[i].state] + '"></tr>');
 					state = $('<td></td>').append('<center><a>' + data[i].state + '</a><button class="btn btn-warning" type="button" onclick="changesstate(' + data[i].iphash6 +',' + 10 + ')">禁用</button></center>');
 				}else{
-					trTag = $('<tr class="' + a[data[i].state] + '"></tr>');
+					trTag = $('<tr class="' + a[5] + '"></tr>');
 					state = $('<td></td>').append('<center><a>' + data[i].state + '</a><button class="btn btn-success" type="button" onclick="changesstate(' + data[i].iphash6 +',' + 1 +')">启用</button></center>');
 				}
 

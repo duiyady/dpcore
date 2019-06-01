@@ -10,10 +10,18 @@
     </insert>
 
     <update id="updateState" parameterType="string">
-            UPDATE t_file SET file_state = CONCAT(file_state,#{iphash6})  WHERE file_name=#{location} ;
+        UPDATE t_file SET file_state = CONCAT(file_state,#{iphash6})  WHERE file_name=#{location} ;
     </update>
 
     <select id="getLocalRecentFile" resultType="string">
-            select file_name as fileName from t_file where file_fserver=#{iphash6} and file_time between #{last} and #{now}
+        select file_name as fileName from t_file where file_fserver=#{iphash6} and file_time between #{last} and #{now}
+    </select>
+
+    <select id="getAllCount" parameterType="string" resultType="int">
+        select count(*) from t_file where file_owner=#{account}
+    </select>
+
+    <select id="getPageData" resultType="string">
+        select file_name from t_file where file_owner=#{account} limit #{begin},#{size}
     </select>
 </mapper>

@@ -59,7 +59,7 @@ public class RedirectFilter implements Filter {
                             logger.error("转发失败", e);
                         }
                     } else {
-                        response.getWriter().write("{\"code\": -5,\"msg\":\"system error\",\"data\": \"\"}");
+                        response.getWriter().write("{\"code\": -5,\"msg\":\"no useful slaves\",\"data\": \"\"}");
                     }
                     return;
                 } else if (uri.contains("/test/")) {

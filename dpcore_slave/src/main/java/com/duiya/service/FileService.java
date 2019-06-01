@@ -13,7 +13,7 @@ public interface FileService {
      * @param multipartFiles
      * @return
      */
-    Map<Integer, String> saveFile(String account, MultipartFile... multipartFiles);
+    Map<String, String> saveFile(String account, MultipartFile... multipartFiles);
 
     /**
      * 获取本机图片写入输出流
@@ -32,4 +32,7 @@ public interface FileService {
 
     void saveFile(MultipartFile... multipartFiles);
 
+    Map<String, Object> getPage(int page, int size, int allPage, String account);
+
+    int getAllCount(String account);
 }

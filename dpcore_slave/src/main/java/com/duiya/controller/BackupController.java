@@ -39,7 +39,6 @@ public class BackupController {
      */
     @RequestMapping(value = "get", method = RequestMethod.GET)
     @ResponseBody
-    @CrossOrigin//跨域
     public void fileGet(@RequestParam("location") String location, HttpServletResponse response) {
         logger.info("invoke--------------------backup/get?location:" + location);
         ServletOutputStream out = null;
@@ -103,7 +102,6 @@ public class BackupController {
      */
     @RequestMapping(value = "hasFile", method = RequestMethod.GET)
     @ResponseBody
-    @CrossOrigin//跨域
     public JSONObject hasFile(@RequestParam("location") String location){
         logger.info("invoke--------------------backup/hasFile?location:" + location);
         Location location1 = Location.getLocation(location);
@@ -130,7 +128,6 @@ public class BackupController {
      */
     @RequestMapping(value = "put", method = RequestMethod.POST)
     @ResponseBody
-    @CrossOrigin//跨域
     public JSONObject filePut(@RequestParam("file") MultipartFile[] multipartFiles,
                               HttpServletRequest request) {
 

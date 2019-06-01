@@ -24,10 +24,6 @@ public class KeyServiceImpl implements KeyService {
     @Autowired
     private UserDao userDao;
 
-    @Override
-    public String createFlag(String account) {
-        return "duiya";
-    }
 
     @Override
     public boolean verify(String account, String key){
@@ -62,6 +58,15 @@ public class KeyServiceImpl implements KeyService {
                 e.printStackTrace();
             }
             return miwen;
+        }
+    }
+
+    @Override
+    public void delUpFlag(String account) {
+        try {
+            redisCache.deleteCache("upf" + account);
+        }catch (Exception e){
+
         }
     }
 }

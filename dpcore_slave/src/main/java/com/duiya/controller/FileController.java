@@ -6,6 +6,8 @@ import com.duiya.model.Location;
 import com.duiya.service.BackupService;
 import com.duiya.service.FileService;
 import com.duiya.service.KeyService;
+import com.duiya.service.UserService;
+import com.duiya.utils.HttpUtil;
 import com.duiya.utils.ResponseUtil;
 import com.duiya.utils.StringUtil;
 import org.slf4j.Logger;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +30,6 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("file")
-@CrossOrigin
 public class FileController {
 
     private Logger logger = LoggerFactory.getLogger(FileController.class);
@@ -41,6 +43,9 @@ public class FileController {
     @Autowired
     private BackupService backupService;
 
+    @Autowired
+    private UserService userService;
+
     /**
      * 上传文件
      * @param multipartFiles
@@ -50,6 +55,7 @@ public class FileController {
      */
     @RequestMapping(value = "upload", method = RequestMethod.POST)
     @ResponseBody
+    @CrossOrigin//跨域
     public JSONObject fileUpLoad(@RequestParam("file") MultipartFile[] multipartFiles,
                                  @RequestParam(value = "account") String account,
                                  @RequestParam(value = "flag", required = false) String flag) {
@@ -76,8 +82,9 @@ public class FileController {
                 }
 
                 //进行文件保存
-                Map<Integer, String> result = fileService.saveFile(account, multipartFiles);
+                Map<String, String> result = fileService.saveFile(account, multipartFiles);
                 if (result != null) {
+                    keyService.delUpFlag(account);
                     return ResponseUtil.constructOKResponse("requst succeed", result);
                 } else {
                     return ResponseUtil.constructUnknownErrorResponse("unknow error, please try again later");
@@ -176,6 +183,43 @@ public class FileController {
             logger.error("获取上传图片的flag失败", e);
             e.printStackTrace();
             return ResponseUtil.constructUnknownErrorResponse("unknown error");
+        }
+    }
+
+
+    @RequestMapping(value = "getPage", method = RequestMethod.GET)
+    @ResponseBody
+    public JSONObject getPage(@RequestParam(name = "account", required = false)String account,
+                              @RequestParam(name = "page")Integer page,
+                              @RequestParam(name="size", required = false)Integer size,
+                              HttpServletRequest request){
+
+        if(size == null || size <= 0){
+            size = 10;
+        }
+        if(page == 0){
+            page = 1;
+        }
+        String ip = HttpUtil.getIp(request);
+        try {
+            boolean login = userService.hasUser(account, ip, 0);
+            //login = true;
+
+            if (login) {
+                int allCount = fileService.getAllCount(account);
+                int allPage = (allCount + size - 1) / size;
+                if (page > allPage) {
+                    return ResponseUtil.constructOversizeResponse("page is oversize");
+                } else {
+                    Map<String, Object> result = fileService.getPage(page, size, allPage, account);
+                    return ResponseUtil.constructOKResponse("success", result);
+                }
+            } else {
+                return ResponseUtil.constructNoUserResponse();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseUtil.constructUnknownErrorResponse("system error");
         }
     }
 

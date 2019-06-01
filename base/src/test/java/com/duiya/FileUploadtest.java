@@ -11,7 +11,7 @@ public class FileUploadtest {
     }
 
     public static void getFlag() throws Exception{
-        String mess = "OmEl+KsmwDP4vevnKw/rjbflyNjQtM9nldC7ts8Shqd57FI0J5AYOhdXHc8FnYrCUxYHyNoVwkwQamVs9zn5DwwiYvY3z/jdBi/Vh0Eau8lw/kBXSqEzyzJU6X6u0XJU8TyMlmJ5ccRIjb8JKOv9z21B0ybOo2dAhoP4P1ntM+g=";
+        String mess = "OlZ8EC6IBf5qqvFWKsqIQWcUpvmDyWM/mCDVuWyOrkDQZFGid+fUJmhdliPo2l9JyrTQXHpM/u8fA2pOagobTJL71tFVR+kezxEF0AKCiRK1252ePE35X1QtIWTHyZ/slR6StM/y877qoi4v1PUA/iXaUswYYPM8F6LmepG3r1E=";
         String mi = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAIg/N/Aw5mXPkoPOArX6SYyZVmar\n" +
                 "TfxVuSPrep2soxIzdjYTjQ4rlntu0Yd4QJ6Hc7iRx6nwqUn4qUV5jlQRkqjsx9ghC/9Ig9dMJKcu\n" +
                 "oVHZ+ldzfggBzvP0kA9EJTKd6g1y1MfSUu5HS8tJy8s7ogjT3U3O1N9m0vPXGzkK30NHAgMBAAEC\n" +

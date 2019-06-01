@@ -71,4 +71,41 @@ public class UserService {
             return "epass";
         }
     }
+
+    /**
+     * 退出登录
+     * @param account
+     * @param state
+     */
+    public void logout(String account, int state){
+        if(state == 0){
+            redisCache.deleteCache(account);
+        }else if(state == 1){
+            redisCache.deleteCache("root"+account);
+        }
+    }
+
+    public boolean hasUser(String account, String ip, int type){
+        if(type == 0){
+            try {
+                String ipn = redisCache.getCache(account, String.class);
+                if(ipn.equals(ip)){
+                    return true;
+                }
+            } catch (Exception e) {
+                return false;
+            }
+        }else{
+            try {
+                String ipn = redisCache.getCache("root"+account, String.class);
+                if(ipn.equals(ip)){
+                    return true;
+                }
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return false;
+    }
+
 }

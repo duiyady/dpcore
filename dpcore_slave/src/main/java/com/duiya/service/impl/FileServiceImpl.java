@@ -35,9 +35,9 @@ public class FileServiceImpl implements FileService {
     private RedisCache redisCache;
 
     @Override
-    public Map<Integer, String> saveFile(String account, MultipartFile... multipartFiles) {
+    public Map<String, String> saveFile(String account, MultipartFile... multipartFiles) {
         List<Picture> data = new LinkedList<>();
-        Map<Integer, String> result = new HashMap<>();
+        Map<String, String> result = new HashMap<>();
         for(int i = 0; i < multipartFiles.length; i++){
             MultipartFile mf = multipartFiles[i];
             if(!mf.isEmpty()){
@@ -58,7 +58,8 @@ public class FileServiceImpl implements FileService {
                     picture.setFileState("null");
                     logger.error("保存图片失败", e);
                 }
-                result.put(i, picture.getFileName());
+
+                result.put(mf.getOriginalFilename(), picture.getFileName());
                 data.add(picture);
             }
         }
@@ -119,5 +120,20 @@ public class FileServiceImpl implements FileService {
                 }
             }
         }
+    }
+
+    @Override
+    public Map<String, Object> getPage(int page, int size, int allPage, String account) {
+        Map<String, Object> map = new HashMap<>();
+        int begin = (page-1)*size;
+        List<String> file = fileDao.getPageData(begin, size, account);
+        map.put("allPage", allPage);
+        map.put("files", file);
+        return map;
+    }
+
+    @Override
+    public int getAllCount(String account) {
+        return fileDao.getAllCount(account);
     }
 }

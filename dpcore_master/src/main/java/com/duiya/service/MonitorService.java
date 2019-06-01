@@ -31,7 +31,6 @@ public class MonitorService {
         try {
             responseModel = HttpUtil.sendGetModel(url, null);
         } catch (IOException e) {
-            e.printStackTrace();
             logger.error("心跳检测时http失败", e);
         }
         return responseModel;

@@ -6,10 +6,8 @@ import com.duiya.init.BaseConfig;
 import com.duiya.init.SlaveMess;
 import com.duiya.model.Slave;
 import com.duiya.service.SlaveServie;
-import com.duiya.utils.RSAUtil;
-import com.duiya.utils.ResponseEnum;
-import com.duiya.utils.ResponseUtil;
-import com.duiya.utils.StringUtil;
+import com.duiya.service.UserService;
+import com.duiya.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,10 @@ public class SlaveController {
 
     @Autowired
     private SlaveServie slaveServie;
+
+    @Autowired
+    private UserService userServie;
+
 
     /**
      * 注册slave
@@ -112,26 +114,14 @@ public class SlaveController {
             return ResponseUtil.constructArgErrorResponse("iphash6不对");
         }
 
-        String ip = request.getHeader("x-forwarded-for");
-        if(ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) ip = request.getHeader("Proxy-Client-IP");
-        if(ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) ip = request.getHeader("WL-Proxy-Client-IP");
-        if(ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) ip = request.getRemoteAddr();
-        String tmp = null;
-        try {
-            tmp = redisCache.getCache("root"+account, String.class);
-        } catch (Exception e) {
-            //e.printStackTrace();
-        }
-//        if(tmp == null){
-//            return ResponseUtil.constructNoUserResponse();
-//        }
-//        if(tmp.equals(ip)){
-        System.out.println(state);
+        String ip = HttpUtil.getIp(request);
+        boolean login = userServie.hasUser(account, ip, 1);
+        if(login){
             slaveServie.changeSlaveState(state, iphash6);
             return ResponseUtil.constructOKResponse("success", null);
-//        }else{
-//            return ResponseUtil.constructNoUserResponse();
-//        }
+        }else{
+            return ResponseUtil.constructNoUserResponse();
+        }
 
     }
 
@@ -144,15 +134,21 @@ public class SlaveController {
     @RequestMapping(value = "changeblance")
     @ResponseBody
     public JSONObject changeblance(@RequestParam(value = "blance")Integer blance,
-                                       @RequestParam(value = "account", required = false) String account){
+                                   @RequestParam(value = "account", required = false) String account,
+                                   HttpServletRequest request){
 
         if(blance != 0 && blance != 1){
             return ResponseUtil.constructArgErrorResponse("策略错误");
         }
 
-        slaveServie.changeblancetype(blance);
-
-        return ResponseUtil.constructOKResponse("success", null);
+        String ip = HttpUtil.getIp(request);
+        boolean login = userServie.hasUser(account, ip, 1);
+        if(login) {
+            slaveServie.changeblancetype(blance);
+            return ResponseUtil.constructOKResponse("success", null);
+        }else{
+            return ResponseUtil.constructNoUserResponse();
+        }
     }
 
     /**
@@ -162,9 +158,15 @@ public class SlaveController {
      */
     @RequestMapping(value = "getslaves")
     @ResponseBody
-    public JSONObject getSlaves(@RequestParam(value = "account", required = false)String account){
-        return ResponseUtil.constructResponse(ResponseEnum.OK, "success", SlaveMess.getSalves());
-
+    public JSONObject getSlaves(@RequestParam(value = "account", required = false)String account,
+                                HttpServletRequest request){
+        String ip = HttpUtil.getIp(request);
+        boolean login = userServie.hasUser(account, ip, 1);
+        if(login) {
+            return ResponseUtil.constructResponse(ResponseEnum.OK, "success", SlaveMess.getSalves());
+        }else{
+            return ResponseUtil.constructNoUserResponse();
+        }
     }
 
     /**
@@ -174,9 +176,15 @@ public class SlaveController {
      */
     @RequestMapping(value = "getblance")
     @ResponseBody
-    public JSONObject getBlance(@RequestParam(value = "account", required = false)String account){
-
-        return ResponseUtil.constructResponse(ResponseEnum.OK, "success", BaseConfig.BALANCEFUN);
+    public JSONObject getBlance(@RequestParam(value = "account", required = false)String account,
+                                HttpServletRequest request){
+        String ip = HttpUtil.getIp(request);
+        boolean login = userServie.hasUser(account, ip, 1);
+        if(login) {
+            return ResponseUtil.constructResponse(ResponseEnum.OK, "success", BaseConfig.BALANCEFUN);
+        }else{
+            return ResponseUtil.constructNoUserResponse();
+        }
     }
 
     /**
@@ -203,6 +211,12 @@ public class SlaveController {
 
         if(SlaveMess.hasSlaveByIp(iphash6) == false){
             return ResponseUtil.constructArgErrorResponse("iphash6不对");
+        }
+
+        String ip = HttpUtil.getIp(request);
+        boolean login = userServie.hasUser(account, ip, 1);
+        if(login == false){
+            return ResponseUtil.constructNoUserResponse();
         }
 
         int result = slaveServie.changeQuan(quan, iphash6);
