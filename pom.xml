@@ -26,7 +26,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.encoding>UTF-8</maven.compiler.encoding><!-- 编译时的编码 -->
     <spring.version>5.1.3.RELEASE</spring.version>
-    <mybatis.version>3.4.6</mybatis.version>
+    <mybatis.version>3.5.6</mybatis.version>
   </properties>
 
   <dependencies>
